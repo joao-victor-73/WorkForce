@@ -65,7 +65,7 @@ class Folha_pagamento(db.Model):
 @app.route('/lista')
 def lista_de_funcionario():
     lista_func = Funcionarios.query.order_by(Funcionarios.id_func)
-    return render_template('lista.html', lista_func=lista_func)
+    return render_template('lista.html', lista_func=lista_func, titulo="Lista de Funcionários")
 
 
 @app.route('/cadastro')
