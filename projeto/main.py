@@ -1,7 +1,18 @@
 from flask import Flask, render_template, request, redirect, session, flash
+from flask_sqlalchemy import SQLAlchemy  # pip install flask-SQLAlchemy
 
 
 app = Flask(__name__)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:darc147@localhost/workforce'
+print('Banco de dados CONECTADO')
+
+db = SQLAlchemy(app)  # Instanciando a aplicação para o SQLAlchemy
+
+
+@app.route('/lista')
+def lista_funcionario():
+    return render_template('lista.html')
 
 
 @app.route('/cadastro')
@@ -18,8 +29,6 @@ def criando():
     tel2 = request.form['tel2']
     data_nascimento = request.form['birthdate']
     salario = request.form['salary']
-
-    
 
 
 if __name__ == '__main__':
