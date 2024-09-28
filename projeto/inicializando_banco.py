@@ -180,10 +180,3 @@ conectar.commit()
 
 cursor.close()
 conectar.close()
-
-
-
-
-
-
-# SELECT NAS TABELAS:
