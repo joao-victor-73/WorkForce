@@ -86,7 +86,7 @@ class Folha_pagamento(db.Model):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', titulo="Página principal")
 
 
 @app.route('/lista')
@@ -100,8 +100,15 @@ def cadastro_funcionario():
     return render_template('cadastro.html')
 
 
-@app.route('/criando')
-def criando():
+# Essa rota, redireciona o usuário para o formulario de criação/cadastro
+@app.route('/novo_funcionario')
+def novo_funcionario():
+    return render_template("cadastro.html", titulo="Cadastrar Funcionário")
+
+
+# Essa rota coleta o que foi digitado no formulario e cria/cadastra o funcionário
+@app.route('/criando_funcionario')
+def criando_funcionario():
     # Requisitando as informações do fórmulario:
     nome = request.form['nome_func']
     email = request.form['email']
