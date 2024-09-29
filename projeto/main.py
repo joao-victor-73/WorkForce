@@ -107,7 +107,7 @@ def novo_funcionario():
 
 
 # Essa rota coleta o que foi digitado no formulario e cria/cadastra o funcionário
-@app.route('/criando_funcionario')
+@app.route('/criando_funcionario', methods=['POST',])
 def criando_funcionario():
     # Requisitando as informações do fórmulario:
     nome = request.form['nome_func']
