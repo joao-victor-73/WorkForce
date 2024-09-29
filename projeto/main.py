@@ -90,7 +90,7 @@ def index():
 
 
 @app.route('/lista')
-def lista_de_funcionario():
+def lista_de_funcionarios():
     lista_func = Funcionarios.query.order_by(Funcionarios.id_func).all()
     return render_template('lista.html', lista_func=lista_func, titulo="Lista de Funcionários")
 
