@@ -73,7 +73,7 @@ class Folha_pagamento(db.Model):
 
     # Criando a Foreign Key da tabela
     fk_id_func = db.Column(db.Integer, db.ForeignKey(
-        'funcionarios.id_func'), nullalbe=False)
+        'funcionarios.id_func'), nullable=False)
 
     # Criando a relação da tabela 'folha_pagamento' com 'funcionarios'
     funcionario = db.relationship('Funcionarios', backref='folha_pagamentos')
@@ -91,7 +91,7 @@ def index():
 
 @app.route('/lista')
 def lista_de_funcionario():
-    lista_func = Funcionarios.query.order_by(Funcionarios.id_func)
+    lista_func = Funcionarios.query.order_by(Funcionarios.id_func).all()
     return render_template('lista.html', lista_func=lista_func, titulo="Lista de Funcionários")
 
 

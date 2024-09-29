@@ -18,6 +18,8 @@
                 <tr>
                     <td> {{ funcionario.id_func }} </td>
                     <td> {{ funcionario.nome_func }} </td>
+                    <td> {{ funcionario.departamento.nome_departamento }} </td>
+                    <td> {{ funcionario.cargo.nome_cargo }} </td>
                     <td> {{ funcionario.status_func }} </td>
                 </tr>
             {% endfor %}
