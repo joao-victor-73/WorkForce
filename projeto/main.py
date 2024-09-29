@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, flash
+from flask import Flask, render_template, request, redirect, session, flash, url_for
 from flask_sqlalchemy import SQLAlchemy  # pip install flask-SQLAlchemy
 
 
@@ -116,6 +116,36 @@ def criando_funcionario():
     tel2 = request.form['tel2']
     data_nascimento = request.form['birthdate']
     salario = request.form['salary']
+
+    # Aqui faremos uma consulta ao banco de dados utilizando o método 'query', para assim
+    # tentarmos encontrar por meio do nome(nome_func), se já tem algum registro do funcionário
+    # E o 'filter_by' vai servir para filtrar os registros onde o campo nome_func corresponde ao nome fornecido.
+    # Caso o resultado disso tenha sido encontrado ou não um funcionario, ele será atribuido a váriavel 'funcionario'.
+
+    funcionario = Funcionarios.query.filter_by(nome_func=nome)
+    # OBS(29/09): remodelar o banco de dados para adicionar um campo de CPF, para assim facilitar
+    #             a busca pelos registros de algum funcionário e a verificação ser melhor
+
+    # Se a consulta, por acaso retornar um funcionário, ele entrará nesse bloco
+    if funcionario:
+        flash('Funcionário já está cadastrado!')
+        return redirect(url_for('lista_de_funcionarios'))
+
+    # Se não retornar nenhum funcionário na consulta:
+
+    # Instânciando um funcionário, passando os valores do fórmulario como argumentos
+    novo_funcionario = Funcionarios(nome_func=nome, email=email, tel1=tel1,
+                                    tel2=tel2, data_nascimento=data_nascimento, salario=salario)
+
+    # Salvando o novo_funcionario no banco de dados
+    # o objeto novo_funcionario é adicionado à sessão do banco de dados.
+    db.session.add(novo_funcionario)
+    # Aqui, as mudanças, que são a inserção de um novo registro, são confirmadas/comitadas.
+    db.session.commit()
+
+    # Após a coleta das informações do formulario, a rota/função terá um retorno
+    # de redirect para outra página, que é básicamente a página de lista de funcionários
+    return redirect(url_for('lista_de_funcionarios'))
 
 
 if __name__ == '__main__':
