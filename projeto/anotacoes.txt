@@ -1,0 +1,39 @@
+Talvez seja melhor reformular o banco de dados para funcionários
+    Porque é muita informação para uma tabela só e eu estava pensando em
+    separa a tabela funcionario para a tabela de registros pessoais
+    e a tabela de registros do emprego.
+
+    E ai é so criar na mesma pagina de cadastro, dois formularios separados
+    para inserir essas informações.
+    E também na hora de inserir essas informações, é só fazer duas query
+    separadas (encontrar um meio para isso)
+
+
+    TABELA funcionarios
+        - id_func
+        - fk_id_emprego
+        - fk_id_pessoais
+        - fk_id_cargo
+        - fk_id_departamento
+
+    TABELA registros_pessoais
+        - id_pessoais
+        - fk_id_func
+        - nome_func
+        - email
+        - tel1
+        - tel2
+        - endereco
+        - cidade
+
+        
+    TABELA registros_emprego
+        - id_emprego
+        - fk_id_func
+        - CPF
+        - RG
+        - salario
+        - data_contratacao
+        - cargo
+        - departamento
+        - supervisor

@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy  # pip install flask-SQLAlchemy
 
 
 app = Flask(__name__)
+app.secret_key = 'random_key'
 
 # Fazendo a conexão com o banco de dados através do SQLAlchemy
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:darc147@localhost/workforce'
@@ -95,7 +96,7 @@ def lista_de_funcionarios():
     return render_template('lista.html', lista_func=lista_func, titulo="Lista de Funcionários")
 
 
-@app.route('/cadastro')
+@app.route('/cadastro', methods=['POST', ])
 def cadastro_funcionario():
     return render_template('cadastro.html')
 
@@ -114,7 +115,7 @@ def criando_funcionario():
     email = request.form['email']
     tel1 = request.form['tel1']
     tel2 = request.form['tel2']
-    data_nascimento = request.form['birthdate']
+    data_contratacao = request.form['contratacao']
     salario = request.form['salary']
 
     # Aqui faremos uma consulta ao banco de dados utilizando o método 'query', para assim
@@ -122,9 +123,11 @@ def criando_funcionario():
     # E o 'filter_by' vai servir para filtrar os registros onde o campo nome_func corresponde ao nome fornecido.
     # Caso o resultado disso tenha sido encontrado ou não um funcionario, ele será atribuido a váriavel 'funcionario'.
 
-    funcionario = Funcionarios.query.filter_by(nome_func=nome)
+    funcionario = Funcionarios.query.filter_by(nome_func=nome).first()
     # OBS(29/09): remodelar o banco de dados para adicionar um campo de CPF, para assim facilitar
     #             a busca pelos registros de algum funcionário e a verificação ser melhor
+
+    print("VERIFICANDO SE EXISTE FUNCIONÁRIO...")
 
     # Se a consulta, por acaso retornar um funcionário, ele entrará nesse bloco
     if funcionario:
@@ -134,14 +137,23 @@ def criando_funcionario():
     # Se não retornar nenhum funcionário na consulta:
 
     # Instânciando um funcionário, passando os valores do fórmulario como argumentos
-    novo_funcionario = Funcionarios(nome_func=nome, email=email, tel1=tel1,
-                                    tel2=tel2, data_nascimento=data_nascimento, salario=salario)
+    novo_funcionario = Funcionarios(nome_func=nome,
+                                    email=email,
+                                    tel1=tel1,
+                                    tel2=tel2,
+                                    data_contratacao=data_contratacao,
+                                    salario=salario)
+
+    print("ADICIONAND FUNCIONÁRIO NA TABELA")
 
     # Salvando o novo_funcionario no banco de dados
     # o objeto novo_funcionario é adicionado à sessão do banco de dados.
     db.session.add(novo_funcionario)
     # Aqui, as mudanças, que são a inserção de um novo registro, são confirmadas/comitadas.
     db.session.commit()
+
+    print("REDIRECIONANDO PARA A LISTA DE FUNCIONÁRIOS")
+    flash('Funcionário cadastrado com sucesso!')
 
     # Após a coleta das informações do formulario, a rota/função terá um retorno
     # de redirect para outra página, que é básicamente a página de lista de funcionários
