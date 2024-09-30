@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css"> <!-- Use o mesmo arquivo CSS -->
+    <title>Gerenciamento de Salários - Sistema de Gestão de RH</title>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Gerenciamento de Salários</h1>
+            <nav>
+                <ul>
+                    <li><a href="Dashboard.html">Dashboard</a></li>
+                    <li><a href="CadastroFuncionarios.html">Cadastro de Funcionários</a></li>
+                    <li><a href="GestaoFerias.html">Gestão de Férias</a></li>
+                    <li><a href="ControleFrequencia.html">Controle de Frequência</a></li>
+                    <li><a href="ControleAcessos.html">Controle de Acessos</a></li>
+                    <li><a href="Relatorios.html">Relatórios</a></li>
+                    <li><a href="index.html">Sair</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <h2>Registro de Salário</h2>
+            <form id="formSalario" method="POST" action="registrarSalario.php"> <!-- Alterar a ação para o backend -->
+                <div class="textfield">
+                    <label for="funcionario">Funcionário:</label>
+                    <input type="text" id="funcionario" name="funcionario" placeholder="Nome do Funcionário" required>
+                </div>
+                <div class="textfield">
+                    <label for="salario">Salário:</label>
+                    <input type="text" id="salario" name="salario" placeholder="Salário" required>
+                </div>
+                <button type="submit" class="btn-submit">Registrar Salário</button>
+                <button type="button" class="btn-return" onclick="window.location.href='Dashboard.html'">Voltar</button>
+            </form>
+
+            <h2>Lista de Salários</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Funcionário</th>
+                        <th>Salário</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Aqui você pode preencher a tabela com dados de salários dos funcionários -->
+                    <tr>
+                        <td>Nome do Funcionário</td>
+                        <td>R$ 2.500,00</td>
+                        <td>
+                            <button class="btn-edit">Editar</button>
+                            <button class="btn-delete">Excluir</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 Sistema de Gestão de Recursos Humanos</p>
+        </footer>
+    </div>
+    <script src="js/script.js"></script> <!-- Crie um arquivo JS para a lógica -->
+</body>
+</html>

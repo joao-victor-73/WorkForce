@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css"> <!-- Use o mesmo arquivo CSS -->
+    <title>Relatórios e Indicadores - Sistema de Gestão de RH</title>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Relatórios e Indicadores</h1>
+            <nav>
+                <ul>
+                    <li><a href="Dashboard.html">Dashboard</a></li>
+                    <li><a href="CadastroFuncionarios.html">Cadastro de Funcionários</a></li>
+                    <li><a href="GestaoFerias.html">Gestão de Férias</a></li>
+                    <li><a href="ControleFrequencia.html">Controle de Frequência</a></li>
+                    <li><a href="GerenciamentoSalarios.html">Gerenciamento de Salários</a></li>
+                    <li><a href="ControleAcessos.html">Controle de Acessos</a></li>
+                    <li><a href="index.html">Sair</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <h2>Indicadores de Desempenho</h2>
+            <div class="indicadores">
+                <div class="indicador">
+                    <h3>Total de Funcionários</h3>
+                    <p>50</p>
+                </div>
+                <div class="indicador">
+                    <h3>Média de Salário</h3>
+                    <p>R$ 3.000,00</p>
+                </div>
+                <div class="indicador">
+                    <h3>Total de Férias</h3>
+                    <p>10</p>
+                </div>
+            </div>
+
+            <h2>Relatórios</h2>
+            <form id="formRelatorio" method="POST" action="gerarRelatorio.php"> <!-- Alterar a ação para o backend -->
+                <div class="textfield">
+                    <label for="tipoRelatorio">Tipo de Relatório:</label>
+                    <select id="tipoRelatorio" name="tipoRelatorio" required>
+                        <option value="salarios">Salários</option>
+                        <option value="frequencia">Frequência</option>
+                        <option value="ferias">Férias</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-submit

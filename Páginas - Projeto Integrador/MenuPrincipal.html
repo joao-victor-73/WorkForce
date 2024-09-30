@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css"> <!-- Crie um arquivo CSS para estilizar -->
+    <title>Dashboard - Sistema de Gestão de RH</title>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Dashboard - Sistema de Gestão de Recursos Humanos</h1>
+            <nav>
+                <ul>
+                    <li><a href="CadastroF.html">Cadastro de Funcionários</a></li>
+                    <li><a href="GestaoFerias.html">Gestão de Férias</a></li>
+                    <li><a href="ControleFrequencia.html">Controle de Frequência</a></li>
+                    <li><a href="GerenciamentoSalarios.html">Gerenciamento de Salários</a></li>
+                    <li><a href="ControleAcessos.html">Controle de Acessos</a></li>
+                    <li><a href="Relatorios.html">Relatórios</a></li>
+                    <li><a href="index.html">Sair</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <section>
+                <h2>Bem-vindo ao Sistema de Gestão de Recursos Humanos</h2>
+                <p>Aqui você pode gerenciar todas as informações relacionadas aos funcionários, incluindo cadastro, férias, frequência e muito mais.</p>
+            </section>
+
+            <section>
+                <h2>Visão Geral</h2>
+                <div class="card">
+                    <h3>Total de Funcionários</h3>
+                    <p id="totalFuncionarios">0</p> <!-- Será preenchido via JavaScript -->
+                </div>
+                <div class="card">
+                    <h3>Total de Férias Pendentes</h3>
+                    <p id="feriasPendentes">0</p> <!-- Será preenchido via JavaScript -->
+                </div>
+                <div class="card">
+                    <h3>Total de Frequência Registrada</h3>
+                    <p id="frequenciaRegistrada">0</p> <!-- Será preenchido via JavaScript -->
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 Sistema de Gestão de Recursos Humanos</p>
+        </footer>
+    </div>
+    <script src="js/script.js"></script> <!-- Crie um arquivo JS para a lógica -->
+</body>
+</html>
