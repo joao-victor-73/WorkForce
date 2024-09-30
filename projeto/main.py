@@ -15,49 +15,58 @@ db = SQLAlchemy(app)  # Instanciando a aplicação para o SQLAlchemy
 
 # Criando classe para as informações das tabelas
 
+# Enumeração para o status do funcionário
+class StatusFunc(enum.Enum):
+    EFETIVO = "EFETIVO"
+    FERIAS = "FERIAS"
+    DEMITIDO = "DEMITIDO"
+    ATESTADO = "ATESTADO"
+
+
 class Departamentos(db.Model):
     __tablename__ = 'departamentos'
 
     id_departamento = db.Column(
         db.Integer, primary_key=True, autoincrement=True)
-    nome_departamento = db.Column(db.String(100))
-    id_gerente = db.Column(db.Integer, unique=True)
+    nome_departamento = db.Column(db.String(100), nullable=False)
+    nome_supervisor = db.Column(db.String(100))
 
     def __repr__(self):
         return '<Name %r>' % self.name
 
 
-class Cargos(db.Model):
-    __tablename__ = 'cargos'
+class Pessoas(db.Model):
+    __tablename__ = 'pessoas'
 
-    id_cargo = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    nome_cargo = db.Column(db.String(100))
-
-    def __repr__(self):
-        return '<Name %r>' % self.name
+    id_pessoa = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    nome = db.Column(db.String(100), nullable=False)
+    cpf = db.Column(db.String(14), nullable=False)
+    data_nascimento = db.Column(db.Date)
+    tel1 = db.Column(db.String(20))
+    tel2 = db.Column(db.String(20))
+    endereco = db.Column(db.String(100))
+    cidade = db.Column(db.String(30))
 
 
 class Funcionarios(db.Model):
     __tablename__ = 'funcionarios'
 
     id_func = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    nome_func = db.Column(db.String(100), unique=True, nullable=False)
     email = db.Column(db.String(100))
-    tel1 = db.Column(db.String(15), nullable=False)
-    tel2 = db.Column(db.String(15))
     data_contratacao = db.Column(db.Date, nullable=False)
     salario = db.Column(db.Numeric(10, 2), nullable=False)
-    status_func = db.Column(
-        db.Enum('EFETIVO', 'FERIAS', 'DEMITIDO', 'ATESTADO'))
-
+    nome_cargo = db.Column(db.String(100))
+    status_func = db.Column(db.Enum(StatusFunc),
+                            nullable=False, default=StatusFunc.EFETIVO)
     # Criando as foreign key da tabela
-    fk_id_cargo = db.Column(db.Integer, db.ForeignKey(
-        'cargos.id_cargo'), nullable=False)
     fk_id_departamento = db.Column(db.Integer, db.ForeignKey(
-        'departamentos.id_departamento'), nullable=False)
+        'departamentos.id_departamento', ondelete='SET NULL', onupdate='CASCADE'))
+
+    fk_id_pessoa = db.Column(db.Integer, db.ForeignKey(
+        'pessoas.id_pessoa', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
 
     # Criando as relações entre as tabelas
-    cargo = db.relationship('Cargos', backref='funcionarios')
+    pessoa = db.relationship('Pessoa', backref='funcionarios')
     departamento = db.relationship('Departamentos', backref='funcionarios')
 
     def __repr__(self):
@@ -75,7 +84,7 @@ class Folha_pagamento(db.Model):
 
     # Criando a Foreign Key da tabela
     fk_id_func = db.Column(db.Integer, db.ForeignKey(
-        'funcionarios.id_func'), nullable=False)
+        'funcionarios.id_func', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
 
     # Criando a relação da tabela 'folha_pagamento' com 'funcionarios'
     funcionario = db.relationship('Funcionarios', backref='folha_pagamentos')
