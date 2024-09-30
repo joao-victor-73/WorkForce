@@ -2,59 +2,85 @@
 
 {% block conteudo %}
     <div class="container mt-5">
-        <h2>Cadastro do Funcionário</h2>
-        <form action="{{url_for('criando_funcionario')}}" method='POST'>
-            <div class="mb-3">
-                <label for="name" class="form-label">Nome</label>
-                <input type="text" class="form-control" name="nome_func" placeholder="Digite o nome" required>
-            </div>
-
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" name="email" placeholder="Digite o email">
-            </div>
-            
-            <div class="mb-3">
-                <label for="cpf" class="form-label">CPF</label>
-                <input type="text" class="form-control" name="cpf" name="cpf"
-                       placeholder="000.000.000-00" 
-                       pattern="\d{3}\.\d{3}\.\d{3}-\d{2}" 
-                       maxlength="14" required>
-                <div class="form-text">Insira o CPF no formato: 000.000.000-00</div>
-            </div>
-
-            <div class="mb-3 row">
-                <div class="col">
-                    <label for="tel1" class="form-label">Telefone Principal</label>
-                    <input type="tel" class="form-control" id="tel1" name="tel1" 
-                           placeholder="(xx) xxxx-xxxx" 
-                           pattern="\(\d{2}\)\s\d{4,5}-\d{4}" 
-                           required>
-                    <div class="form-text">Insira o telefone no formato: (xx) xxxx-xxxx ou (xx) xxxxx-xxxx</div>
+        <h2>Informações Pessoais</h2>
+        <div>
+            <form action="{{url_for('criando_funcionario')}}" method='POST'>
+                <div class="textfield">
+                    <label for="nomeCompleto">Nome Completo:</label>
+                    <input type="text" name="nome" placeholder="Nome Completo" required>
                 </div>
-            
-                <div class="col">
-                    <label for="tel2" class="form-label">Telefone Secundário (Opcional)</label>
-                    <input type="tel" class="form-control" id="tel2" name="tel2" 
-                           placeholder="(xx) xxxx-xxxx" 
-                           pattern="\(\d{2}\)\s\d{4,5}-\d{4}">
-                    <div class="form-text">Insira o telefone no formato: (xx) xxxx-xxxx ou (xx) xxxxx-xxxx</div>
-                </div>
-            </div>
 
-            <div class="mb-3 row">
-                <div class="col">
-                    <label for="contratacao" class="form-label">Data de Contratação</label>
-                    <input type="date" class="form-control" name="contratacao" required>
+                <div class="textfield">
+                    <label for="cpf">CPF:</label>
+                    <input type="text" name="cpf" placeholder="CPF:" required>
                 </div>
-                <div class="col">
-                    <label for="salary" class="form-label">Salário</label>
-                    <input type="number" class="form-control" name="salary" placeholder="Digite seu salário" min="0" step="0.01" required>
-                </div>
-            </div>
 
-            <button type="submit" class="btn btn-primary">Cadastrar</button>
-            <a class= "btn btn-primary" href="{{ url_for('lista_de_funcionarios') }}"> Voltar </a>
-    </div>
+                <div class="textfield">
+                    <label for="dataNascimento">Data de Nascimento:</label>
+                    <input type="date" name="data_nascimento">
+                </div>
+                
+                <div class="textfield">
+                    <label for="tel1">Número para contato 1:</label>
+                    <input type="text"  name="tel1" placeholder="Número para contato 1">
+                </div>
+
+                <div class="textfield">
+                    <label for="tel2">Número para contato 2:</label>
+                    <input type="text"  name="tel2" placeholder="Número para contato 2">
+                </div>
+                
+                <div class="textfield">
+                    <label for="endereco">Endereço:</label>
+                    <input type="text"  name="endereco" placeholder="Endereco">
+                </div>
+
+                <div class="textfield">
+                    <label for="cidade">Cidade:</label>
+                    <input type="text" name="cidade" placeholder="Cidade">
+                </div>
+            </form>
+        </div>
+
+        <br>
+
+        <h2>Informações do Emprego</h2>
+        <div>
+            <form>
+                <div class="textfield">
+                    <label for="email">E-mail:</label>
+                    <input type="email" name="email" placeholder="E-mail">
+                </div>
+
+                <div class="textfield">
+                    <label for="data_contratacao">Data de Contratação:</label>
+                    <input type="date" name="data_contratacao" required>
+                </div>
+                
+                <div class="textfield">
+                    <label for="salario">Salário:</label>
+                    <input type="number" name="salario" placeholder="Salário" required>
+                </div>
+                
+                <div class="textfield">
+                    <label for="cargo">Cargo:</label>
+                    <input type="text" name="cargo" placeholder="Cargo" required>
+                </div>
+
+                <div class="textfield">
+                    <label for="departamento">Departamento:</label>
+                    <input type="text" id="departamento" name="departamento" placeholder="Departamento" required>
+                </div>
+                
+                <div class="textfield">
+                    <label for="status">Status:</label>
+                    <select id="status" name="status">
+                        <option value="ativo">Ativo</option>
+                        <option value="inativo">Inativo</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+
 
 {% endblock %}
