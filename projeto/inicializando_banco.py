@@ -46,59 +46,69 @@ TABLES = {}
 # Criando tabela departamentos
 TABLES['departamentos'] = ('''
         CREATE TABLE departamentos (
-            id_departamento INT PRIMARY KEY AUTO_INCREMENT,
-            nome_departamento VARCHAR(100) NOT NULL,
-            id_gerente INT UNIQUE
+            `id_departamento` INT PRIMARY KEY AUTO_INCREMENT,
+            `nome_departamento` VARCHAR(100) NOT NULL,
+            `nome_supervisor` VARCHAR(100)
         );''')
 
 
-# Criando tabela cargos
-TABLES['cargos'] = ('''
-        CREATE TABLE cargos (
-	        id_cargo INT PRIMARY KEY AUTO_INCREMENT,
-            nome_cargo VARCHAR(100)
-        );''')
+# Criando tabela pessoas
+TABLES['pessoas'] = ('''
+    CREATE TABLE pessoas (
+        `id_pessoa` INT PRIMARY KEY AUTO_INCREMENT,
+        `nome` VARCHAR(100) NOT NULL,
+        `cpf` VARCHAR(14) UNIQUE NOT NULL,
+        `data_nascimento` DATE,
+        `tel1` VARCHAR(20),
+        `tel2` VARCHAR(20),
+        `endereco` VARCHAR(100),
+        `cidade` VARCHAR(30)
+    );
+''')
 
 
+# Criando tabela funcionarios
 TABLES['funcionarios'] = ('''
-        CREATE TABLE funcionarios (
-            `id_func` INT PRIMARY KEY AUTO_INCREMENT,
-            `nome_func` VARCHAR(100) UNIQUE NOT NULL,
-            `email` VARCHAR(100),
-            `tel1` VARCHAR(15) NOT NULL,
-            `tel2` VARCHAR(15),
-            `data_contratacao` DATE NOT NULL,
-            `salario` DECIMAL(10, 2),
-            `status_func` ENUM('EFETIVO', 'FERIAS' , 'DEMITIDO', 'ATESTADO'),
-            `fk_id_cargo` INT,
-            `fk_id_departamento` INT, 
-            CONSTRAINT `fk_funcionario_cargo`
-                FOREIGN KEY (`fk_id_cargo`)
-                REFERENCES cargos (`id_cargo`)
-                ON DELETE CASCADE 
-                ON UPDATE CASCADE,
-            
-            CONSTRAINT `fk_funcionario_departamento`
-                FOREIGN KEY (`fk_id_departamento`)
-                REFERENCES departamentos (`id_departamento`)
-                ON DELETE CASCADE
-                ON UPDATE CASCADE
-        ); ''')
+    CREATE TABLE funcionarios (
+        `id_func` INT PRIMARY KEY AUTO_INCREMENT,
+        `fk_id_pessoa` INT NOT NULL,
+        `email` VARCHAR(100),
+        `data_contratacao` DATE NOT NULL,
+        `salario` DECIMAL(10, 2) NOT NULL,
+        `nome_cargo` INT,
+        `status_func` ENUM('EFETIVO', 'FERIAS', 'DEMITIDO', 'ATESTADO') NOT NULL DEFAULT 'EFETIVO',
+        `fk_id_departamento` INT,
+        
+        CONSTRAINT `fk_funcionario_pessoa` 
+            FOREIGN KEY (`fk_id_pessoa`) 
+            REFERENCES pessoas (`id_pessoa`) 
+            ON DELETE CASCADE 
+            ON UPDATE CASCADE,
+        
+        CONSTRAINT `fk_funcionario_departamento` 
+            FOREIGN KEY (`fk_id_departamento`) 
+            REFERENCES departamentos (`id_departamento`) 
+            ON DELETE SET NULL 
+            ON UPDATE CASCADE
+    ); ''')
 
+
+# Criando tabela folha_pagamento
 TABLES['folha_pagamento'] = ('''
-        CREATE TABLE folha_pagamento (
-            `id_pagamento` INT PRIMARY KEY AUTO_INCREMENT,
-            `data_pagamento` DATE NOT NULL,
-            `salario_base` DECIMAL(10, 2) NOT NULL,
-            `deducoes` DECIMAL(10, 2) NOT NULL,
-            `salario_liquido` DECIMAL(10, 2) NOT NULL,
-            `fk_id_func` INT,
-            CONSTRAINT `fk_folhaPagamento_funcionario`
-                FOREIGN KEY (`fk_id_func`)
-                REFERENCES funcionarios (`id_func`)
-                ON DELETE CASCADE
-                ON UPDATE CASCADE
-        );''')
+    CREATE TABLE folha_pagamento (
+        `id_pagamento` INT PRIMARY KEY AUTO_INCREMENT,
+        `data_pagamento` DATE NOT NULL,
+        `salario_base` DECIMAL(10, 2) NOT NULL,
+        `deducoes` DECIMAL(10, 2) NOT NULL,
+        `salario_liquido` DECIMAL(10, 2) NOT NULL,
+        `fk_id_func` INT,
+        
+        CONSTRAINT `fk_folhaPagamento_funcionario` 
+            FOREIGN KEY (`fk_id_func`) 
+            REFERENCES funcionarios (`id_func`) 
+            ON DELETE CASCADE 
+            ON UPDATE CASCADE
+    ); ''')
 
 # Criando um loop for para percorrer o dicionario TABLES
 # e fazer a criação das tabelas
@@ -124,42 +134,39 @@ Os placeholders %s são marcadores usados em consultas SQL para
 indicar onde os valores devem ser inseridos de forma segura.
 """
 
-departamento_query_sql = 'INSERT INTO departamentos (nome_departamento, id_gerente) VALUES (%s, %s)'
+departamento_query_sql = 'INSERT INTO departamentos (nome_departamento, nome_supervisor) VALUES (%s, %s)'
 departamentos = [
-    ('Recursos Humanos', 1),
-    ('Financeiro', 2),
-    ('TI', 3),
-    ('Marketing', 4)
+    ('Recursos Humanos', 'Ana Clara Silva'),
+    ('Desenvolvimento', 'Marcos Almeida'),
+    ('Vendas', 'Fernanda Costa'),
+    ('Marketing', 'Lucas Pereira')
 ]
 cursor.executemany(departamento_query_sql, departamentos)
 # o método `executemany` serve para executar a inserção de vários registros de uma única vez.
 
 
-cargos_query_sql = 'INSERT INTO cargos (nome_cargo) VALUES (%s)'
-cargos = [
-    ('Analista de RH', ),
-    ('Gerente Financeiro', ),
-    ('Desenvolvedor', ),
-    ('Coordenador de Marketing', )
+pessoas_query_sql = 'INSERT INTO pessoas (nome, cpf, data_nascimento, tel1, tel2, endereco, cidade) VALUES (%s, %s, %s, %s, %s, %s, %s)'
+pessoas = [
+    ('João Carlos', '123.456.789-00', '1985-06-12',
+     '(11) 99999-1111', '(11) 98888-2222', 'Rua A, 123', 'São Paulo'),
+    ('Maria Souza', '987.654.321-00', '1990-08-25',
+     '(21) 99999-3333', None, 'Av. B, 456', 'Rio de Janeiro'),
+    ('Pedro Lima', '456.789.123-00', '1982-04-15', '(31) 99999-4444',
+     '(31) 98888-5555', 'Rua C, 789', 'Belo Horizonte'),
+    ('Carla Mendes', '789.123.456-00', '1995-09-30',
+     '(41) 99999-6666', None, 'Av. D, 321', 'Curitiba')
 ]
-cursor.executemany(cargos_query_sql, cargos)
+cursor.executemany(pessoas_query_sql, pessoas)
 # OBS: precisa-se colocar uma virgula após o valor, porque para o `executemany`, espera-se uma lista de tuplas.
 #  Mas se caso eu passar as informações sem uma virgula, o Python tratará isso como uma String, não como uma tupla.
 
 
-funcionarios_query_sql = 'INSERT INTO funcionarios (nome_func, email, tel1, tel2, data_contratacao, salario, status_func, fk_id_cargo, fk_id_departamento) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'
+funcionarios_query_sql = 'INSERT INTO funcionarios (fk_id_pessoa, email, data_contratacao, salario, nome_cargo, status_func, fk_id_departamento) VALUES (%s, %s, %s, %s, %s, %s, %s)'
 funcionarios = [
-    ('Carlos Silva', 'carlos.silva@empresa.com', '99999-9999',
-     '98888-8888', '2020-01-10', 4500.00, 'EFETIVO', 1, 1),
-
-    ('Ana Souza', 'ana.souza@empresa.com', '98888-7777',
-     '97777-6666', '2019-05-15', 6000.00, 'FERIAS', 2, 2),
-
-    ('Marcos Lima', 'marcos.lima@empresa.com', '96666-5555',
-     '95555-4444', '2021-07-01', 5000.00, 'EFETIVO', 3, 3),
-
-    ('Fernanda Costa', 'fernanda.costa@empresa.com',
-     '94444-3333', None, '2018-12-20', 7000.00, 'EFETIVO', 4, 4)
+    (1, 'joao.carlos@empresa.com', '2020-01-10', 3500.00, 1, 'EFETIVO', 1),
+    (2, 'maria.souza@empresa.com', '2018-07-15', 4500.00, 2, 'FERIAS', 2),
+    (3, 'pedro.lima@empresa.com', '2015-05-22', 6000.00, 3, 'EFETIVO', 3),
+    (4, 'carla.mendes@empresa.com', '2019-10-12', 3200.00, 4, 'ATESTADO', 4)
 ]
 # None vai ser o mesmo que NULL, vai colocar None quando o valor da inserção for NULL
 cursor.executemany(funcionarios_query_sql, funcionarios)
@@ -167,10 +174,10 @@ cursor.executemany(funcionarios_query_sql, funcionarios)
 
 folha_pagamento_query_sql = 'INSERT INTO folha_pagamento (data_pagamento, salario_base, deducoes, salario_liquido, fk_id_func) VALUES (%s, %s, %s, %s, %s)'
 folha_pagamentos = [
-    ('2023-09-30', 4500.00, 500.00, 4000.00, 1),
-    ('2023-09-30', 6000.00, 800.00, 5200.00, 2),
-    ('2023-09-30', 5000.00, 300.00, 4700.00, 3),
-    ('2023-09-30', 7000.00, 700.00, 6300.00, 4)
+    ('2024-09-01', 3500.00, 300.00, 3200.00, 1),
+    ('2024-09-01', 4500.00, 500.00, 4000.00, 2),
+    ('2024-09-01', 6000.00, 600.00, 5400.00, 3),
+    ('2024-09-01', 3200.00, 200.00, 3000.00, 4)
 ]
 cursor.executemany(folha_pagamento_query_sql, folha_pagamentos)
 
