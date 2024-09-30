@@ -1,8 +1,0 @@
-# Fazendo a conexão com o banco de dados através do SQLAlchemy
-db_configs = {'SGBD': 'mysql+mysqlconnector',
-                      'username': 'root',
-                      'password': 'darc147',
-                      'host': 'localhost',
-                      'database': 'workforce'}
-
-app.config['SQLALCHEMY_DATABASE_URI'] = (f"{db_configs['SGBD']}://{db_configs['username']}:{db_configs['password']}@{db_configs['host']}/{db_configs['database']}")
