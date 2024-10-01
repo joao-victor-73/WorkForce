@@ -114,7 +114,8 @@ def lista_de_funcionarios():
     ).join(Departamentos, Funcionarios.fk_id_departamento == Departamentos.id_departamento).all()
 
     for funcionario, departamento in lista_func:
-        print(f"Funcionário: {funcionario.pessoa.nome}, Departamento: {departamento}")
+        print(f"Funcionário: {
+              funcionario.pessoa.nome}, Departamento: {departamento}")
 
     return render_template('lista.html', lista_func=lista_func, titulo="Lista de Funcionários")
 
@@ -188,7 +189,10 @@ def criando_funcionario():
 
     # Pensar em como lidar caso não seja encontrado alguma departamento. (método temporário abaixo)
     if not departamento_obj:
-        flash("Departamento não encontrado!")
+        # Se o departamento não for encontrado, devemos reverter a inserção da nova pessoa
+        db.session.delete(nova_pessoa)  # Remove a nova pessoa
+        db.session.commit()  # Comita a exclusão
+        flash("Departamento não encontrado! Cadastro do funcionário não foi realizado.")
         return redirect(url_for('lista_de_funcionarios'))
 
     # Criando um novo funcionário com as informações da Pessoa recém-criada
