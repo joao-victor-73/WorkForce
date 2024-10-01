@@ -120,41 +120,71 @@ def novo_funcionario():
 # Essa rota coleta o que foi digitado no formulario e cria/cadastra o funcionário
 @app.route('/criando_funcionario', methods=['POST',])
 def criando_funcionario():
-    # Requisitando as informações do fórmulario:
+    # Requisitando as informações PESSOAIS:
     nome = request.form['nome_func']
-    email = request.form['email']
+    cpf = request.form['cpf']
+    data_nascimento = request.form['data_nascimento']
     tel1 = request.form['tel1']
     tel2 = request.form['tel2']
-    data_contratacao = request.form['contratacao']
-    salario = request.form['salary']
+    endereco = request.form['endereco']
+    cidade = request.form['cidade']
+
+    # Requisitando as INFORMAÇÕES DO EMPREGO:
+    email = request.form['email']
+    data_contratacao = request.form['data_contratacao']
+    salario = request.form['salario']
+    cargo = request.form['cargo']
+    departamento = request.form['departamento']
+    status = request.form['status']
 
     # Aqui faremos uma consulta ao banco de dados utilizando o método 'query', para assim
-    # tentarmos encontrar por meio do nome(nome_func), se já tem algum registro do funcionário
-    # E o 'filter_by' vai servir para filtrar os registros onde o campo nome_func corresponde ao nome fornecido.
-    # Caso o resultado disso tenha sido encontrado ou não um funcionario, ele será atribuido a váriavel 'funcionario'.
+    # tentarmos encontrar por meio do cpf se já tem algum registro de pessoa.
+    # E o 'filter_by' vai servir para filtrar os registros onde o campo cpf corresponde ao cpf fornecido.
+    # Caso o resultado disso tenha sido encontrado ou não um cpf já existente, ele será atribuido a váriavel 'funcionario'.
 
-    funcionario = Funcionarios.query.filter_by(nome_func=nome).first()
-    # OBS(29/09): remodelar o banco de dados para adicionar um campo de CPF, para assim facilitar
-    #             a busca pelos registros de algum funcionário e a verificação ser melhor
+    pessoa = Pessoas.query.filter_by(cpf=cpf).first()
 
-    print("VERIFICANDO SE EXISTE FUNCIONÁRIO...")
+    print("VERIFICANDO SE EXISTE A PESSOA...")
 
-    # Se a consulta, por acaso retornar um funcionário, ele entrará nesse bloco
-    if funcionario:
-        flash('Funcionário já está cadastrado!')
+    # Se a consulta, por acaso retornar um cpf cadastrado, ele entrará nesse bloco
+    # Pensar em como lidar caso seja encontrado alguma pessoa já cadastrada. (método temporário abaixo)
+    if pessoa:
+        flash('Pessoa já está cadastrado! Redirecionando para a lista de funcionários')
         return redirect(url_for('lista_de_funcionarios'))
 
     # Se não retornar nenhum funcionário na consulta:
 
     # Instânciando um funcionário, passando os valores do fórmulario como argumentos
-    novo_funcionario = Funcionarios(nome_func=nome,
-                                    email=email,
-                                    tel1=tel1,
-                                    tel2=tel2,
-                                    data_contratacao=data_contratacao,
-                                    salario=salario)
+    nova_pessoa = Pessoas(nome=nome,
+                          cpf=cpf,
+                          data_nascimento=data_nascimento,
+                          tel1=tel1,
+                          tel2=tel2,
+                          endereco=endereco,
+                          cidade=cidade)
 
-    print("ADICIONAND FUNCIONÁRIO NA TABELA")
+    print("ADICIONAND PESSOA NA TABELA")
+    # Adicionando a nova pessoa ao banco
+    db.session.add(nova_pessoa)
+    db.session.commit()
+
+    # Buscando o departamento
+    departamento_obj = Departamentos.query.filter_by(
+        nome_departamento=departamento).first()
+
+    # Pensar em como lidar caso não seja encontrado alguma departamento. (método temporário abaixo)
+    if not departamento_obj:
+        flash("Departamento não encontrado!")
+        return redirect(url_for('lista_de_funcionarios'))
+
+    # Criando um novo funcionário com as informações da Pessoa recém-criada
+    novo_funcionario = Funcionarios(fk_id_pessoa=nova_pessoa.id_pessoa,
+                                    email=email,
+                                    data_contratacao=data_contratacao,
+                                    salario=salario,
+                                    nome_cargo=cargo,
+                                    status_func=status,
+                                    fk_id_departamento=departamento_obj.id_departamento)
 
     # Salvando o novo_funcionario no banco de dados
     # o objeto novo_funcionario é adicionado à sessão do banco de dados.
@@ -162,8 +192,8 @@ def criando_funcionario():
     # Aqui, as mudanças, que são a inserção de um novo registro, são confirmadas/comitadas.
     db.session.commit()
 
-    print("REDIRECIONANDO PARA A LISTA DE FUNCIONÁRIOS")
     flash('Funcionário cadastrado com sucesso!')
+    print("REDIRECIONANDO PARA A LISTA DE FUNCIONÁRIOS")
 
     # Após a coleta das informações do formulario, a rota/função terá um retorno
     # de redirect para outra página, que é básicamente a página de lista de funcionários
