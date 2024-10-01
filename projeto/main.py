@@ -23,18 +23,6 @@ class StatusFunc(enum.Enum):
     ATESTADO = "ATESTADO"
 
 
-class Departamentos(db.Model):
-    __tablename__ = 'departamentos'
-
-    id_departamento = db.Column(
-        db.Integer, primary_key=True, autoincrement=True)
-    nome_departamento = db.Column(db.String(100), nullable=False)
-    nome_supervisor = db.Column(db.String(100))
-
-    def __repr__(self):
-        return '<Name %r>' % self.name
-
-
 class Pessoas(db.Model):
     __tablename__ = 'pessoas'
 
@@ -46,6 +34,21 @@ class Pessoas(db.Model):
     tel2 = db.Column(db.String(20))
     endereco = db.Column(db.String(100))
     cidade = db.Column(db.String(30))
+
+    def __repr__(self):
+        return f"<Funcionarios id: {self.id_func}, nome: {self.pessoa.nome}>"
+
+
+class Departamentos(db.Model):
+    __tablename__ = 'departamentos'
+
+    id_departamento = db.Column(
+        db.Integer, primary_key=True, autoincrement=True)
+    nome_departamento = db.Column(db.String(100), nullable=False)
+    nome_supervisor = db.Column(db.String(100))
+
+    def __repr__(self):
+        return '<Name %r>' % self.name
 
 
 class Funcionarios(db.Model):
@@ -66,7 +69,7 @@ class Funcionarios(db.Model):
         'pessoas.id_pessoa', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
 
     # Criando as relações entre as tabelas
-    pessoa = db.relationship('Pessoa', backref='funcionarios')
+    pessoa = db.relationship('Pessoas', backref='funcionarios')
     departamento = db.relationship('Departamentos', backref='funcionarios')
 
     def __repr__(self):
@@ -102,7 +105,17 @@ def index():
 
 @app.route('/lista')
 def lista_de_funcionarios():
-    lista_func = Funcionarios.query.order_by(Funcionarios.id_func).all()
+    # lista_func = Funcionarios.query.order_by(Funcionarios.id_func).all()
+
+    # Consulta para obter todos os funcionários com seus departamentos
+    lista_func = db.session.query(
+        Funcionarios,
+        Departamentos.nome_departamento
+    ).join(Departamentos, Funcionarios.fk_id_departamento == Departamentos.id_departamento).all()
+
+    for funcionario, departamento in lista_func:
+        print(f"Funcionário: {funcionario.pessoa.nome}, Departamento: {departamento}")
+
     return render_template('lista.html', lista_func=lista_func, titulo="Lista de Funcionários")
 
 
@@ -121,7 +134,7 @@ def novo_funcionario():
 @app.route('/criando_funcionario', methods=['POST',])
 def criando_funcionario():
     # Requisitando as informações PESSOAIS:
-    nome = request.form['nome_func']
+    nome = request.form['nome']
     cpf = request.form['cpf']
     data_nascimento = request.form['data_nascimento']
     tel1 = request.form['tel1']
@@ -136,6 +149,7 @@ def criando_funcionario():
     cargo = request.form['cargo']
     departamento = request.form['departamento']
     status = request.form['status']
+    status_enum = StatusFunc[status]  # convertendo a string para o Enum
 
     # Aqui faremos uma consulta ao banco de dados utilizando o método 'query', para assim
     # tentarmos encontrar por meio do cpf se já tem algum registro de pessoa.
@@ -183,7 +197,7 @@ def criando_funcionario():
                                     data_contratacao=data_contratacao,
                                     salario=salario,
                                     nome_cargo=cargo,
-                                    status_func=status,
+                                    status_func=status_enum,
                                     fk_id_departamento=departamento_obj.id_departamento)
 
     # Salvando o novo_funcionario no banco de dados

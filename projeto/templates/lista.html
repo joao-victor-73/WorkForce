@@ -9,18 +9,20 @@
                 <th> Nome </th>
                 <th> Departamento </th>
                 <th> Cargo </th>
+                <th> Data de Contratação </th>
                 <th> Status do Funcionario </th>
             </tr>
         </thead>
 
         <tbody>
-            {% for funcionario in lista_func %}
+            {% for funcionario, departamento in lista_func %}
                 <tr>
-                    <td> {{ funcionario.id_func }} </td>
-                    <td> {{ funcionario.nome_func }} </td>
-                    <td> {{ funcionario.departamento.nome_departamento }} </td>
-                    <td> {{ funcionario.cargo.nome_cargo }} </td>
-                    <td> {{ funcionario.status_func }} </td>
+                    <td>{{ funcionario.id_func }}</td>
+                    <td>{{ funcionario.pessoa.nome }}</td> <!-- Acessando o nome do funcionário através da relação (FK) -->
+                    <td>{{ departamento }}</td>
+                    <td>{{ funcionario.nome_cargo }}</td>
+                    <td>{{ funcionario.data_contratacao.strftime('%d/%m/%y') }}</td> <!-- Formatando o tipo de data -->
+                    <td>{{ funcionario.status_func.value }}</td> <!-- Acessa o valor do Enumm -->
                 </tr>
             {% endfor %}
         </tbody>

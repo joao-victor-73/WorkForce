@@ -37,7 +37,7 @@ CREATE TABLE funcionarios (
     email VARCHAR(100),
     data_contratacao DATE NOT NULL,
     salario DECIMAL(10, 2) NOT NULL,
-    nome_cargo INT,
+    nome_cargo VARCHAR(100),
     status_func ENUM('EFETIVO', 'FERIAS', 'DEMITIDO', 'ATESTADO') NOT NULL DEFAULT 'EFETIVO',
     fk_id_departamento INT,
     
