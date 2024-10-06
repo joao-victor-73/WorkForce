@@ -122,13 +122,16 @@ def lista_de_funcionarios():
 
 @app.route('/cadastro', methods=['POST', ])
 def cadastro_funcionario():
-    return render_template('cadastro.html')
+    return render_template('lista.html')
 
 
 # Essa rota, redireciona o usuário para o formulario de criação/cadastro
 @app.route('/novo_funcionario')
 def novo_funcionario():
-    return render_template("cadastro.html", titulo="Cadastrar Funcionário")
+    # Passando a lista de departamentos para ter opção na hora docadastramento
+    lista_departamentos = Departamentos.query.all()
+
+    return render_template("cadastro.html", titulo="Cadastrar Funcionário", departamentos=lista_departamentos)
 
 
 # Essa rota coleta o que foi digitado no formulario e cria/cadastra o funcionário
@@ -148,7 +151,10 @@ def criando_funcionario():
     data_contratacao = request.form['data_contratacao']
     salario = request.form['salario']
     cargo = request.form['cargo']
-    departamento = request.form['departamento']
+
+    # Usando o ID do departamento diretamente do formulário
+    fk_id_departamento = request.form['departamento']  # Aqui você pega o ID
+
     status = request.form['status']
     status_enum = StatusFunc[status]  # convertendo a string para o Enum
 
@@ -185,7 +191,7 @@ def criando_funcionario():
 
     # Buscando o departamento
     departamento_obj = Departamentos.query.filter_by(
-        nome_departamento=departamento).first()
+        fk_id_departamento).first()
 
     # Pensar em como lidar caso não seja encontrado alguma departamento. (método temporário abaixo)
     if not departamento_obj:
@@ -215,6 +221,64 @@ def criando_funcionario():
 
     # Após a coleta das informações do formulario, a rota/função terá um retorno
     # de redirect para outra página, que é básicamente a página de lista de funcionários
+    return redirect(url_for('lista_de_funcionarios'))
+
+
+@app.route('/editar_informacoes/<int:id_func>')
+def editar_informacoes(id_func):
+    # funcionario = Funcionarios.query.filter_by(id_func=id_func)
+    # pessoa = Pessoas.query.filter_by(id_pessoa=funcionario.fk_id_pessoa)
+
+    funcionario = Funcionarios.query.get_or_404(
+        id_func)  # Obtendo diretamente pelo ID
+    pessoa = Pessoas.query.get_or_404(funcionario.fk_id_pessoa)
+    departamentos = Departamentos.query.all()
+
+    return render_template("editar.html", titulo="Cadastrar Funcionário", funcionario=funcionario, pessoa=pessoa, departamentos=departamentos)
+
+
+@app.route('/atualizar_informacoes', methods=['POST',])
+def atualizar_informacoes():
+
+    # Atualiza as informações pessoais
+    atualiza_pessoa = Pessoas.query.filter_by(
+        id_pessoa=request.form['id_pessoa']).first()
+
+    atualiza_pessoa.nome = request.form['nome']
+    atualiza_pessoa.cpf = request.form['cpf']
+    atualiza_pessoa.data_nascimento = request.form['data_nascimento']
+    atualiza_pessoa.tel1 = request.form['tel1']
+    atualiza_pessoa.tel2 = request.form['tel2']
+    atualiza_pessoa.endereco = request.form['endereco']
+    atualiza_pessoa.cidade = request.form['cidade']
+
+    # Atualiza as informações de emprego
+    atualiza_emprego = Funcionarios.query.filter_by(
+        id_func=request.form['id_func']).first()
+
+    atualiza_emprego.email = request.form['email']
+    atualiza_emprego.data_contratacao = request.form['data_contratacao']
+    atualiza_emprego.salario = request.form['salario']
+    atualiza_emprego.nome_cargo = request.form['cargo']
+    atualiza_emprego.status_func = request.form['status']
+
+    # Pode ser obtido de um select
+    departamento = Departamentos.query.filter_by(
+        nome_departamento=request.form['departamento']).first()
+
+    # Tratando possível erro
+    if departamento:
+        atualiza_emprego.fk_id_departamento = departamento.id_departamento
+    else:
+        atualiza_emprego.fk_id_departamento = None
+
+    # Salva as alterações no banco de dados
+    db.session.add(atualiza_pessoa)
+    db.session.add(atualiza_emprego)
+    db.session.commit()
+
+    flash('Funcionário atualizado com sucesso!')
+
     return redirect(url_for('lista_de_funcionarios'))
 
 

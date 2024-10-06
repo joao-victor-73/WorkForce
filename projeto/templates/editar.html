@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+    <div>
+        <h2>Informações Pessoais</h2>
+        <div>
+            <form action="{{url_for('atualizar_informacoes')}}" method='POST'>
+                
+                <input type="hidden" name="id_pessoa" value="{{ funcionario.fk_id_pessoa }}">
+                <input type="hidden" name="id_func" value="{{ funcionario.id_func }}">
+
+                <div class="textfield">
+                    <label for="nomeCompleto">Nome Completo:</label>
+                    <input type="text" name="nome" placeholder="Nome Completo" value="{{ pessoa.nome }}" required>
+                </div>
+
+                <div class="textfield">
+                    <label for="cpf">CPF:</label>
+                    <input type="text" name="cpf" placeholder="CPF:" value="{{pessoa.cpf}}" required>
+                </div>
+
+                <div class="textfield">
+                    <label for="dataNascimento">Data de Nascimento:</label>
+                    <input type="date" name="data_nascimento" value="{{ pessoa.data_nascimento }}">
+                </div>
+                
+                <div class="textfield">
+                    <label for="tel1">Número para contato 1:</label>
+                    <input type="text"  name="tel1" placeholder="Número para contato 1" value="{{ pessoa.tel1 }}">
+                </div>
+
+                <div class="textfield">
+                    <label for="tel2">Número para contato 2:</label>
+                    <input type="text"  name="tel2" placeholder="Número para contato 2" value="{{ pessoa.tel2 }}">
+                </div>
+                
+                <div class="textfield">
+                    <label for="endereco">Endereço:</label>
+                    <input type="text"  name="endereco" placeholder="Endereco" value="{{ pessoa.endereco }}">
+                </div>
+
+                <div class="textfield">
+                    <label for="cidade">Cidade:</label>
+                    <input type="text" name="cidade" placeholder="Cidade" value="{{ pessoa.cidade }}">
+                </div>
+                
+
+                <br> 
+
+
+                <h2>Informações do Emprego</h2>
+                <div class="textfield">
+                    <label for="email">E-mail:</label>
+                    <input type="email" name="email" placeholder="E-mail"value="{{ funcionario.email }}" >
+                </div>
+
+                <div class="textfield">
+                    <label for="data_contratacao">Data de Contratação:</label>
+                    <input type="date" name="data_contratacao" value="{{ funcionario.data_contratacao }}" required>
+                </div>
+                
+                <div class="textfield">
+                    <label for="salario">Salário:</label>
+                    <input type="number" name="salario" placeholder="Salário" value="{{ funcionario.salario }}" required>
+                </div>
+                
+                <div class="textfield">
+                    <label for="cargo">Cargo:</label>
+                    <input type="text" name="cargo" placeholder="Cargo" value="{{ funcionario.nome_cargo }}" required>
+                </div>
+
+                <div class="textfield">
+                    <label for="departamento">Departamento:</label>
+                    <select name="departamento" required>
+                        {% for departamento in departamentos %}
+                            <option value="{{ departamento.id_departamento }}" {% if departamento.id_departamento == funcionario.fk_id_departamento %}selected{% endif %}>
+                                {{ departamento.nome_departamento }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="textfield">
+                    <label for="status">Status:</label>
+                    <select name="status" required>
+                        <option value="EFETIVO" {% if funcionario.status_func == 'EFETIVO' %}selected{% endif %}>Efetivo</option>
+                        <option value="FERIAS" {% if funcionario.status_func == 'FERIAS' %}selected{% endif %}>Férias</option>
+                        <option value="DEMITIDO" {% if funcionario.status_func == 'DEMITIDO' %}selected{% endif %}>Demitido</option>
+                        <option value="ATESTADO" {% if funcionario.status_func == 'ATESTADO' %}selected{% endif %}>Atestado</option>
+                    </select>
+                </div>
+
+                <button type="submit">Cadastrar Funcionário</button>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

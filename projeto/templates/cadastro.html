@@ -65,11 +65,15 @@
                     <input type="text" name="cargo" placeholder="Cargo" required>
                 </div>
 
-                <!-- MODIFICAR ISSO DAQUI PARA APRESENTAR OS DEPARTAMENTOS DISPONÍVEIS/JÁ CADASTRADOS -->
-                <div class="textfield">
+                <div>
                     <label for="departamento">Departamento:</label>
-                    <input type="text" name="departamento" placeholder="Departamento" required>
-                </div>
+                    <select name="departamento" id="departamento" required>
+                        <option value="">Selecione um departamento</option>
+                        {% for departamento in departamentos %}
+                            <option value="{{ departamento.id_departamento }}">{{ departamento.nome_departamento }}</option>
+                        {% endfor %}
+                    </select>
+                </div>               
                 
                 <div class="textfield">
                     <label for="status">Status:</label>
