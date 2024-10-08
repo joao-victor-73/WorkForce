@@ -185,56 +185,62 @@ def criando_funcionario():
                           endereco=endereco,
                           cidade=cidade)
 
-    print("ADICIONAND PESSOA NA TABELA")
-    # Adicionando a nova pessoa ao banco
-    db.session.add(nova_pessoa)
-    db.session.commit()
+    try:
+        print("ADICIONAND PESSOA NA TABELA")
+        # Adicionando a nova pessoa ao banco
+        db.session.add(nova_pessoa)
+        db.session.commit()
 
-    print(f"Nova Pessoa criada: {nova_pessoa}")
+        print(f"Nova Pessoa criada: {nova_pessoa}")
 
-    print("Adicionado PESSOA na tabela")
+        print("Adicionado PESSOA na tabela")
 
-    # Buscando o departamento
-    departamento_obj = Departamentos.query.filter_by(
-        id_departamento=fk_id_departamento).first()
+        # Buscando o departamento
+        departamento_obj = Departamentos.query.filter_by(
+            id_departamento=fk_id_departamento).first()
 
-    # Pensar em como lidar caso não seja encontrado alguma departamento. (método temporário abaixo)
-    if not departamento_obj:
-        print("Departamento não encontrado!")  # Verifica se o departamento foi encontrado
+        # Pensar em como lidar caso não seja encontrado alguma departamento. (método temporário abaixo)
+        if not departamento_obj:
+            print("Departamento não encontrado!")  # Verifica se o departamento foi encontrado
 
 
-        # Se o departamento não for encontrado, devemos reverter a inserção da nova pessoa
-        db.session.delete(nova_pessoa)  # Remove a nova pessoa
-        db.session.commit()  # Comita a exclusão
-        flash("Departamento não encontrado! Cadastro do funcionário não foi realizado.")
-        return redirect(url_for('lista_de_funcionarios'))
+            # Se o departamento não for encontrado, devemos reverter a inserção da nova pessoa
+            db.session.delete(nova_pessoa)  # Remove a nova pessoa
+            db.session.commit()  # Comita a exclusão
+            flash("Departamento não encontrado! Cadastro do funcionário não foi realizado.")
+            return redirect(url_for('lista_de_funcionarios'))
 
-    # Adicionar prints de depuração antes de criar novo_funcionario
-    print("Criando novo funcionário com os seguintes dados:")
-    print(f"fk_id_pessoa: {nova_pessoa.id_pessoa}")
-    print(f"email: {email}, data_contratacao: {data_contratacao}, salario: {salario}, cargo: {
-          cargo}, status: {status_enum}, fk_id_departamento: {departamento_obj.id_departamento}")
+        # Adicionar prints de depuração antes de criar novo_funcionario
+        print("Criando novo funcionário com os seguintes dados:")
+        print(f"fk_id_pessoa: {nova_pessoa.id_pessoa}")
+        print(f"email: {email}, data_contratacao: {data_contratacao}, salario: {salario}, cargo: {
+            cargo}, status: {status_enum}, fk_id_departamento: {departamento_obj.id_departamento}")
 
-    # Criando um novo funcionário com as informações da Pessoa recém-criada
-    novo_funcionario = Funcionarios(fk_id_pessoa=nova_pessoa.id_pessoa,
-                                    email=email,
-                                    data_contratacao=data_contratacao,
-                                    salario=salario,
-                                    nome_cargo=cargo,
-                                    status_func=status_enum,
-                                    fk_id_departamento=departamento_obj.id_departamento)
+        # Criando um novo funcionário com as informações da Pessoa recém-criada
+        novo_funcionario = Funcionarios(fk_id_pessoa=nova_pessoa.id_pessoa,
+                                        email=email,
+                                        data_contratacao=data_contratacao,
+                                        salario=salario,
+                                        nome_cargo=cargo,
+                                        status_func=status_enum,
+                                        fk_id_departamento=departamento_obj.id_departamento)
 
-    print("ADICIONANDO FUNCIONÁRIO NA TABELA")
-    print(f"Dados do novo funcionário: {novo_funcionario}")
+        print("ADICIONANDO FUNCIONÁRIO NA TABELA")
+        print(f"Dados do novo funcionário: {novo_funcionario}")
 
-    # Salvando o novo_funcionario no banco de dados
-    # o objeto novo_funcionario é adicionado à sessão do banco de dados.
-    db.session.add(novo_funcionario)
-    # Aqui, as mudanças, que são a inserção de um novo registro, são confirmadas/comitadas.
-    db.session.commit()
+        # Salvando o novo_funcionario no banco de dados
+        # o objeto novo_funcionario é adicionado à sessão do banco de dados.
+        db.session.add(novo_funcionario)
+        # Aqui, as mudanças, que são a inserção de um novo registro, são confirmadas/comitadas.
+        db.session.commit()
 
-    flash('Funcionário cadastrado com sucesso!')
-    print("REDIRECIONANDO PARA A LISTA DE FUNCIONÁRIOS")
+        flash('Funcionário cadastrado com sucesso!')
+        print("REDIRECIONANDO PARA A LISTA DE FUNCIONÁRIOS")
+
+    except Exception as e:
+        db.session.rollback()  # Reverte a transação em caso de erro
+        print(f"Ocorreu um erro: {e}")
+        flash('Erro ao cadastrar funcionário! Tente novamente.')
 
     # Após a coleta das informações do formulario, a rota/função terá um retorno
     # de redirect para outra página, que é básicamente a página de lista de funcionários
