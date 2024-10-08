@@ -111,7 +111,7 @@ def lista_de_funcionarios():
     lista_func = db.session.query(
         Funcionarios,
         Departamentos.nome_departamento
-    ).join(Departamentos, Funcionarios.fk_id_departamento == Departamentos.id_departamento).all()
+    ).outerjoin(Departamentos, Funcionarios.fk_id_departamento == Departamentos.id_departamento).all()
 
     for funcionario, departamento in lista_func:
         print(f"Funcionário: {
