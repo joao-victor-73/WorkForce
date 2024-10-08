@@ -36,7 +36,7 @@ class Pessoas(db.Model):
     cidade = db.Column(db.String(30))
 
     def __repr__(self):
-        return f"<Funcionarios id: {self.id_func}, nome: {self.pessoa.nome}>"
+        return f"<Pessoa id: {self.id_pessoa}, nome: {self.nome}>"
 
 
 class Departamentos(db.Model):
@@ -73,7 +73,7 @@ class Funcionarios(db.Model):
     departamento = db.relationship('Departamentos', backref='funcionarios')
 
     def __repr__(self):
-        return '<Name %r>' % self.name
+        return f"<Funcionarios id: {self.id_func}, nome: {self.pessoa.nome}>"
 
 
 class Folha_pagamento(db.Model):
@@ -111,7 +111,7 @@ def lista_de_funcionarios():
     lista_func = db.session.query(
         Funcionarios,
         Departamentos.nome_departamento
-    ).join(Departamentos, Funcionarios.fk_id_departamento == Departamentos.id_departamento).all()
+    ).outerjoin(Departamentos, Funcionarios.fk_id_departamento == Departamentos.id_departamento).all()
 
     for funcionario, departamento in lista_func:
         print(f"Funcionário: {
@@ -153,7 +153,8 @@ def criando_funcionario():
     cargo = request.form['cargo']
 
     # Usando o ID do departamento diretamente do formulário
-    fk_id_departamento = request.form['departamento']  # Aqui você pega o ID
+    fk_id_departamento = int(request.form['departamento'])  # Aqui você pega o ID
+    
 
     status = request.form['status']
     status_enum = StatusFunc[status]  # convertendo a string para o Enum
@@ -189,17 +190,30 @@ def criando_funcionario():
     db.session.add(nova_pessoa)
     db.session.commit()
 
+    print(f"Nova Pessoa criada: {nova_pessoa}")
+
+    print("Adicionado PESSOA na tabela")
+
     # Buscando o departamento
     departamento_obj = Departamentos.query.filter_by(
-        fk_id_departamento).first()
+        id_departamento=fk_id_departamento).first()
 
     # Pensar em como lidar caso não seja encontrado alguma departamento. (método temporário abaixo)
     if not departamento_obj:
+        print("Departamento não encontrado!")  # Verifica se o departamento foi encontrado
+
+
         # Se o departamento não for encontrado, devemos reverter a inserção da nova pessoa
         db.session.delete(nova_pessoa)  # Remove a nova pessoa
         db.session.commit()  # Comita a exclusão
         flash("Departamento não encontrado! Cadastro do funcionário não foi realizado.")
         return redirect(url_for('lista_de_funcionarios'))
+
+    # Adicionar prints de depuração antes de criar novo_funcionario
+    print("Criando novo funcionário com os seguintes dados:")
+    print(f"fk_id_pessoa: {nova_pessoa.id_pessoa}")
+    print(f"email: {email}, data_contratacao: {data_contratacao}, salario: {salario}, cargo: {
+          cargo}, status: {status_enum}, fk_id_departamento: {departamento_obj.id_departamento}")
 
     # Criando um novo funcionário com as informações da Pessoa recém-criada
     novo_funcionario = Funcionarios(fk_id_pessoa=nova_pessoa.id_pessoa,
@@ -209,6 +223,9 @@ def criando_funcionario():
                                     nome_cargo=cargo,
                                     status_func=status_enum,
                                     fk_id_departamento=departamento_obj.id_departamento)
+
+    print("ADICIONANDO FUNCIONÁRIO NA TABELA")
+    print(f"Dados do novo funcionário: {novo_funcionario}")
 
     # Salvando o novo_funcionario no banco de dados
     # o objeto novo_funcionario é adicionado à sessão do banco de dados.
@@ -262,15 +279,9 @@ def atualizar_informacoes():
     atualiza_emprego.nome_cargo = request.form['cargo']
     atualiza_emprego.status_func = request.form['status']
 
-    # Pode ser obtido de um select
-    departamento = Departamentos.query.filter_by(
-        nome_departamento=request.form['departamento']).first()
-
-    # Tratando possível erro
-    if departamento:
-        atualiza_emprego.fk_id_departamento = departamento.id_departamento
-    else:
-        atualiza_emprego.fk_id_departamento = None
+  # Atualiza o departamento usando o ID do departamento enviado
+    departamento_id = request.form['departamento']
+    atualiza_emprego.fk_id_departamento = departamento_id
 
     # Salva as alterações no banco de dados
     db.session.add(atualiza_pessoa)
