@@ -191,7 +191,7 @@ def criando_funcionario():
 
     # Buscando o departamento
     departamento_obj = Departamentos.query.filter_by(
-        fk_id_departamento).first()
+        id_departamento=fk_id_departamento).first()
 
     # Pensar em como lidar caso não seja encontrado alguma departamento. (método temporário abaixo)
     if not departamento_obj:
@@ -262,15 +262,14 @@ def atualizar_informacoes():
     atualiza_emprego.nome_cargo = request.form['cargo']
     atualiza_emprego.status_func = request.form['status']
 
-    # Pode ser obtido de um select
+    """# Pode ser obtido de um select
     departamento = Departamentos.query.filter_by(
-        nome_departamento=request.form['departamento']).first()
+        nome_departamento=request.form['departamento']).first()"""
 
-    # Tratando possível erro
-    if departamento:
-        atualiza_emprego.fk_id_departamento = departamento.id_departamento
-    else:
-        atualiza_emprego.fk_id_departamento = None
+
+    # Atualiza o departamento usando o ID do departamento enviado
+    departamento_id = request.form['departamento']
+    atualiza_emprego.fk_id_departamento = departamento_id
 
     # Salva as alterações no banco de dados
     db.session.add(atualiza_pessoa)
