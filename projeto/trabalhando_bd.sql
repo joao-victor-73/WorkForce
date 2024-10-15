@@ -10,9 +10,8 @@ USE workforce;
 CREATE TABLE departamentos (
 	id_departamento INT PRIMARY KEY AUTO_INCREMENT,
     nome_departamento VARCHAR(100) NOT NULL,
-    nome_supervisor VARCHAR(100)
+    fk_id_func INT -- Supervisor também é um funcionário
 );
-
 
 
 -- Criando tabela pessoas
@@ -32,11 +31,10 @@ CREATE TABLE pessoas (
 -- Criando tabela funcionarios
 --  Armazena informações relacionadas aos funcionários, vinculando-os a informações pessoais, cargos e departamentos.
 CREATE TABLE funcionarios (
-    id_func INT PRIMARY KEY AUTO_INCREMENT,
+    id_func INT PRIMARY KEY AUTO_INCREMENT, -- Vai ser como a matricula do funcionário
     fk_id_pessoa INT NOT NULL,
     email VARCHAR(100),
-    data_contratacao DATE NOT NULL,
-    salario DECIMAL(10, 2) NOT NULL,
+    data_contratacao DATE NOT NULL, -- Admissão
     nome_cargo VARCHAR(100),
     status_func ENUM('EFETIVO', 'FERIAS', 'DEMITIDO', 'ATESTADO') NOT NULL DEFAULT 'EFETIVO',
     fk_id_departamento INT,
@@ -56,67 +54,148 @@ CREATE TABLE funcionarios (
 
 
 
+-- As duas tabelas abaixo serviram para informar sobre proventos e deduções, e a descrição sobre cada um deles
+
+-- Armazena diferentes tipos de proventos (por exemplo, salário base, comissão, bônus, etc.).
+CREATE TABLE proventos_fpg (
+	id_provento INT PRIMARY KEY AUTO_INCREMENT, -- o id aqui vai ser tipo um código para servir de identificação
+    desc_provento VARCHAR(300) NOT NULL,
+    valor_provento DECIMAL(10, 2)
+);
+
+
+-- Armazena diferentes tipos de deduções (imposto de renda, INSS, etc.).
+CREATE TABLE deducoes_fpg (
+	id_deducao INT PRIMARY KEY AUTO_INCREMENT, -- o id aqui vai ser tipo um código para servir de identificação
+    desc_deducao VARCHAR(300) NOT NULL,
+    valor_deducao DECIMAL(10, 2)
+);
+
+
 -- Criando tabela folha_pagamentos
 -- Armazena informações sobre os pagamentos dos funcionários.
 CREATE TABLE folha_pagamento (
     id_pagamento INT PRIMARY KEY AUTO_INCREMENT,
     data_pagamento DATE NOT NULL,
-    salario_base DECIMAL(10, 2) NOT NULL,
-    deducoes DECIMAL(10, 2) NOT NULL,
-    salario_liquido DECIMAL(10, 2) NOT NULL,
+    tipo ENUM('HORISTA', 'FOLGUISTA', 'INTERMITENTE', 'MENSALISTA', 'PJ') NOT NULL DEFAULT 'HORISTA',
+    num_banco VARCHAR(100),
+    num_agencia VARCHAR(50),
+    conta_deposito VARCHAR(50),
+    salario_base DECIMAL(10, 2) NOT NULL DEFAULT 1414.00,
     fk_id_func INT,
+    fk_id_proventos INT,
+    fk_id_deducoes INT,
     
     CONSTRAINT fk_folhaPagamento_funcionario 
 		FOREIGN KEY (fk_id_func) 
         REFERENCES funcionarios (id_func) 
         ON DELETE CASCADE 
+        ON UPDATE CASCADE,
+        
+	CONSTRAINT fk_folhaPagamento_Deducoes
+		FOREIGN KEY (fk_id_deducoes)
+        REFERENCES deducoes_fpg (id_deducao)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+	
+    CONSTRAINT fk_folhaPagamento_Proventos
+		FOREIGN KEY (fk_id_proventos)
+        REFERENCES proventos_fpg (id_provento)
+        ON DELETE CASCADE
         ON UPDATE CASCADE
 );
 
+-- CRIAÇÃO DE TABELAS INTERMEDIARIAS
+-- As tabelas intermediárias vão relacionar múltiplos proventos e deduções a uma única folha de pagamento.
+-- Assim permitindo que um funcinário tenha múltiplas informações na folha de pagamento.
+
+CREATE TABLE folha_proventos (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    fk_id_pagamento INT,
+    fk_id_provento INT,
+    CONSTRAINT fk_folha_provento_pagamento
+        FOREIGN KEY (fk_id_pagamento) REFERENCES folha_pagamento(id_pagamento) ON DELETE CASCADE,
+    CONSTRAINT fk_folha_provento_provento
+        FOREIGN KEY (fk_id_provento) REFERENCES proventos_fpg(id_provento) ON DELETE CASCADE
+);
 
 
-
--- VERIFICANDO AS TABELAS
-DESC pessoas;
-DESC funcionarios;
-DESC departamentos;
-DESC folha_pagamento;
-
+CREATE TABLE folha_deducoes (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    fk_id_pagamento INT,
+    fk_id_deducao INT,
+    CONSTRAINT fk_folha_deducao_pagamento
+        FOREIGN KEY (fk_id_pagamento) REFERENCES folha_pagamento(id_pagamento) ON DELETE CASCADE,
+    CONSTRAINT fk_folha_deducao_deducao
+        FOREIGN KEY (fk_id_deducao) REFERENCES deducoes_fpg(id_deducao) ON DELETE CASCADE
+);
 
 
 -- INSERINDO REGISTROS NAS TABELAS
-
-INSERT INTO departamentos (nome_departamento, nome_supervisor) VALUES 
-('Recursos Humanos', 'Ana Clara Silva'),
-('Desenvolvimento', 'Marcos Almeida'),
-('Vendas', 'Fernanda Costa'),
-('Marketing', 'Lucas Pereira');
+-- Os INSERT's servirão para fazer testes na aplicação, não são de extrema necessidade
+-- Para fazer a inserção dos dados, seguir a ordem como está
 
 
-INSERT INTO pessoas (nome, cpf, data_nascimento, tel1, tel2, endereco, cidade) VALUES 
-('João Carlos', '123.456.789-00', '1985-06-12', '(11) 99999-1111', '(11) 98888-2222', 'Rua A, 123', 'São Paulo'),
-('Maria Souza', '987.654.321-00', '1990-08-25', '(21) 99999-3333', NULL, 'Av. B, 456', 'Rio de Janeiro'),
-('Pedro Lima', '456.789.123-00', '1982-04-15', '(31) 99999-4444', '(31) 98888-5555', 'Rua C, 789', 'Belo Horizonte'),
-('Carla Mendes', '789.123.456-00', '1995-09-30', '(41) 99999-6666', NULL, 'Av. D, 321', 'Curitiba');
+-- Tabela departamentos
+INSERT INTO departamentos (nome_departamento) 
+VALUES ('Recursos Humanos'), ('Tecnologia da Informação'), ('Marketing');
 
 
-INSERT INTO funcionarios (fk_id_pessoa, email, data_contratacao, salario, nome_cargo, status_func, fk_id_departamento) VALUES 
-(1, 'joao.carlos@empresa.com', '2020-01-10', 3500.00, 1, 'EFETIVO', 1),
-(2, 'maria.souza@empresa.com', '2018-07-15', 4500.00, 2, 'FERIAS', 2),
-(3, 'pedro.lima@empresa.com', '2015-05-22', 6000.00, 3, 'EFETIVO', 3),
-(4, 'carla.mendes@empresa.com', '2019-10-12', 3200.00, 4, 'ATESTADO', 4);
+-- tabela pessoas
+INSERT INTO pessoas (nome, cpf, data_nascimento, tel1, tel2, endereco, cidade)
+VALUES 
+('Carlos Silva', '123.456.789-00', '1985-06-15', '11999999999', NULL, 'Rua A, 100', 'São Paulo'),
+('Ana Costa', '987.654.321-00', '1990-09-20', '11988888888', '1133333333', 'Rua B, 200', 'Rio de Janeiro'),
+('Bruno Oliveira', '456.789.123-00', '1982-11-30', '11977777777', NULL, 'Rua C, 300', 'Curitiba');
 
 
-INSERT INTO folha_pagamento (data_pagamento, salario_base, deducoes, salario_liquido, fk_id_func) VALUES 
-('2024-09-01', 3500.00, 300.00, 3200.00, 1),
-('2024-09-01', 4500.00, 500.00, 4000.00, 2),
-('2024-09-01', 6000.00, 600.00, 5400.00, 3),
-('2024-09-01', 3200.00, 200.00, 3000.00, 4);
+-- tabela funcionarios
+INSERT INTO funcionarios (fk_id_pessoa, email, data_contratacao, nome_cargo, status_func, fk_id_departamento)
+VALUES 
+(1, 'carlos.silva@empresa.com', '2022-01-15', 'Gerente de RH', 'EFETIVO', 1),
+(2, 'ana.costa@empresa.com', '2023-02-01', 'Analista de Sistemas', 'EFETIVO', 2),
+(3, 'bruno.oliveira@empresa.com', '2021-07-10', 'Coordenador de Marketing', 'EFETIVO', 3);
 
 
--- TRAZENDO OS REGISTROS
+-- tabela proventos_fpg
+INSERT INTO proventos_fpg (desc_provento, valor_provento)
+VALUES 
+('Salário Base', 3000.00),
+('Bônus por Desempenho', 500.00),
+('Comissão', 700.00);
 
-SELECT * FROM pessoas;
-SELECT * FROM departamentos;
-SELECT * FROM funcionarios;
-SELECT * FROM folha_pagamento;
+
+-- tabela deducoes_fpg
+INSERT INTO deducoes_fpg (desc_deducao, valor_deducao)
+VALUES 
+('INSS', 330.00),
+('Imposto de Renda', 250.00),
+('Plano de Saúde', 150.00);
+
+
+-- tabela folha_pagamento
+INSERT INTO folha_pagamento (data_pagamento, tipo, num_banco, num_agencia, conta_deposito, salario_base, fk_id_func, fk_id_proventos, fk_id_deducoes)
+VALUES 
+('2024-10-05', 'MENSALISTA', '001', '1234-5', '987654', 3000.00, 1, 1, 1),
+('2024-10-05', 'MENSALISTA', '237', '4321-0', '123456', 3000.00, 2, 2, 2),
+('2024-10-05', 'MENSALISTA', '104', '5678-9', '654321', 3000.00, 3, 3, 3);
+
+
+-- tabela folha_proventos
+INSERT INTO folha_proventos (fk_id_pagamento, fk_id_provento)
+VALUES 
+(1, 1), -- Provento de salário base para o pagamento 1
+(1, 2), -- Provento de bônus para o pagamento 1
+(2, 1), -- Provento de salário base para o pagamento 2
+(3, 1), -- Provento de salário base para o pagamento 3
+(3, 3); -- Provento de comissão para o pagamento 3
+
+
+-- tabela folha_deducoes
+INSERT INTO folha_deducoes (fk_id_pagamento, fk_id_deducao)
+VALUES 
+(1, 1), -- Deducao INSS para o pagamento 1
+(1, 2), -- Deducao IR para o pagamento 1
+(2, 1), -- Deducao INSS para o pagamento 2
+(3, 1), -- Deducao INSS para o pagamento 3
+(3, 3); -- Deducao Plano de Saúde para o pagamento 3
