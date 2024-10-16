@@ -19,7 +19,7 @@
             {% for funcionario, departamento in lista_func %}
                 <tr>
                     <td>{{ funcionario.id_func }}</td>
-                    <td>{{ funcionario.pessoa.nome }}</td> <!-- Acessando o nome do funcionário através da relação (FK) -->
+                    <td><a href="{{ url_for('funcionario_detalhes', id_func=funcionario.id_func) }}">{{ funcionario.pessoa.nome }}</a></td> <!-- Acessando o nome do funcionário através da relação (FK) -->
                     <td>{{ departamento }}</td>
                     <td>{{ funcionario.nome_cargo }}</td>
                     <td>{{ funcionario.data_contratacao.strftime('%d/%m/%y') }}</td> <!-- Formatando o tipo de data -->

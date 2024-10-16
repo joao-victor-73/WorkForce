@@ -326,5 +326,13 @@ def atualizar_informacoes():
     return redirect(url_for('lista_de_funcionarios'))
 
 
+# Rota para mostrar todas as informações do funcionário
+@app.route('/funcionario/<int:id_func>')
+def funcionario_detalhes(id_func):
+    funcionario = Funcionarios.query.get_or_404(id_func)
+    return render_template('funcionario_detalhes.html', funcionario=funcionario)
+
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
