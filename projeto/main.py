@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, session, flash, url_for
 from flask_sqlalchemy import SQLAlchemy  # pip install flask-SQLAlchemy
 import enum
+from datetime import datetime, timezone
 
 
 app = Flask(__name__)
@@ -23,80 +24,126 @@ class StatusFunc(enum.Enum):
     ATESTADO = "ATESTADO"
 
 
+class Departamentos(db.Model):
+    __tablename__ = 'departamentos'
+
+    id_departamento = db.Column(db.Integer, primary_key=True)
+    nome_departamento = db.Column(db.String(100), nullable=False)
+    fk_id_func = db.Column(db.Integer, db.ForeignKey('funcionarios.id_func'))  # Supervisor
+
+    # Relacionamento com a tabela de funcionários (funcionários do departamento)
+    funcionarios = db.relationship('Funcionarios', backref='departamento', lazy=True, foreign_keys='Funcionarios.fk_id_departamento')
+
+    # Relacionamento com o supervisor do departamento
+    supervisor = db.relationship('Funcionarios', backref='departamentos_supervisionados', foreign_keys=[fk_id_func])
+
+
+
+    def __repr__(self):
+        return f'<Departamento {self.nome_departamento}>'
+
+
 class Pessoas(db.Model):
     __tablename__ = 'pessoas'
 
-    id_pessoa = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id_pessoa = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100), nullable=False)
-    cpf = db.Column(db.String(14), nullable=False)
+    cpf = db.Column(db.String(14), unique=True, nullable=False)
     data_nascimento = db.Column(db.Date)
     tel1 = db.Column(db.String(20))
     tel2 = db.Column(db.String(20))
     endereco = db.Column(db.String(100))
     cidade = db.Column(db.String(30))
 
+    # Relacionamento com a tabela de funcionários
+    funcionario = db.relationship('Funcionarios', backref='pessoa', lazy=True)
+
     def __repr__(self):
         return f"<Funcionarios id: {self.id_func}, nome: {self.pessoa.nome}>"
-
-
-class Departamentos(db.Model):
-    __tablename__ = 'departamentos'
-
-    id_departamento = db.Column(
-        db.Integer, primary_key=True, autoincrement=True)
-    nome_departamento = db.Column(db.String(100), nullable=False)
-    nome_supervisor = db.Column(db.String(100))
-
-    def __repr__(self):
-        return '<Name %r>' % self.name
 
 
 class Funcionarios(db.Model):
     __tablename__ = 'funcionarios'
 
-    id_func = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id_func = db.Column(db.Integer, primary_key=True)
+    fk_id_pessoa = db.Column(db.Integer, db.ForeignKey('pessoas.id_pessoa'), nullable=False)
     email = db.Column(db.String(100))
-    data_contratacao = db.Column(db.Date, nullable=False)
-    salario = db.Column(db.Numeric(10, 2), nullable=False)
+    data_contratacao = db.Column(db.Date, nullable=False, default=datetime.now(timezone.utc))
     nome_cargo = db.Column(db.String(100))
-    status_func = db.Column(db.Enum(StatusFunc),
-                            nullable=False, default=StatusFunc.EFETIVO)
-    # Criando as foreign key da tabela
-    fk_id_departamento = db.Column(db.Integer, db.ForeignKey(
-        'departamentos.id_departamento', ondelete='SET NULL', onupdate='CASCADE'))
+    status_func = db.Column(db.Enum('EFETIVO', 'FERIAS', 'DEMITIDO', 'ATESTADO'), nullable=False, default='EFETIVO')
 
-    fk_id_pessoa = db.Column(db.Integer, db.ForeignKey(
-        'pessoas.id_pessoa', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
+    fk_id_departamento = db.Column(db.Integer, db.ForeignKey('departamentos.id_departamento'))
 
-    # Criando as relações entre as tabelas
-    pessoa = db.relationship('Pessoas', backref='funcionarios')
-    departamento = db.relationship('Departamentos', backref='funcionarios')
+    # Relacionamento com folha de pagamento
+    folha_pagamento = db.relationship('Folha_pagamento', backref='funcionarios', lazy=True)
+
 
     def __repr__(self):
-        return '<Name %r>' % self.name
+        return f'<Funcionario {self.nome_cargo}>'
 
 
+# Modelo para Proventos (proventos_fpg)
+class Provento(db.Model):
+    __tablename__ = 'proventos_fpg'
+
+    id_provento = db.Column(db.Integer, primary_key=True)
+    desc_provento = db.Column(db.String(300), nullable=False)
+    valor_provento = db.Column(db.Numeric(10, 2))
+
+
+# Modelo para Deducoes (deducoes_fpg)
+class Deducao(db.Model):
+    __tablename__ = 'deducoes_fpg'
+
+    id_deducao = db.Column(db.Integer, primary_key=True)
+    desc_deducao = db.Column(db.String(300), nullable=False)
+    valor_deducao = db.Column(db.Numeric(10, 2))
+
+
+# Modelo para Folha_pagamento
 class Folha_pagamento(db.Model):
     __tablename__ = 'folha_pagamento'
 
-    id_pagamento = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id_pagamento = db.Column(db.Integer, primary_key=True)
     data_pagamento = db.Column(db.Date, nullable=False)
-    salario_base = db.Column(db.Numeric(10, 2), nullable=False)
-    deducoes = db.Column(db.Numeric(10, 2), nullable=False)
-    salario_liquido = db.Column(db.Numeric(10, 2), nullable=False)
+    tipo = db.Column(db.Enum('HORISTA', 'FOLGUISTA', 'INTERMITENTE', 'MENSALISTA', 'PJ'), nullable=False, default='HORISTA')
+    num_banco = db.Column(db.String(100))
+    num_agencia = db.Column(db.String(50))
+    conta_deposito = db.Column(db.String(50))
+    salario_base = db.Column(db.Numeric(10, 2), nullable=False, default=1414.00)
 
-    # Criando a Foreign Key da tabela
-    fk_id_func = db.Column(db.Integer, db.ForeignKey(
-        'funcionarios.id_func', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
-
-    # Criando a relação da tabela 'folha_pagamento' com 'funcionarios'
-    funcionario = db.relationship('Funcionarios', backref='folha_pagamentos')
+    # Relacionamentos
+    fk_id_func = db.Column(db.Integer, db.ForeignKey('funcionarios.id_func'), nullable=False)
+    fk_id_proventos = db.Column(db.Integer, db.ForeignKey('proventos_fpg.id_provento'))
+    fk_id_deducoes = db.Column(db.Integer, db.ForeignKey('deducoes_fpg.id_deducao'))
 
     def __repr__(self):
         return '<Name %r>' % self.name
 
 # OBS: o db.Numeric é o equivalente ao Decimal do SQL. Esse é o tipo correspondente no SQLAlchemy.
 
+
+# Tabelas intermediárias para folha_proventos e folha_deducoes (Many-to-Many)
+# Modelo intermediário para FolhaProventos
+class FolhaProventos(db.Model):
+    __tablename__ = 'folha_proventos'
+
+    id = db.Column(db.Integer, primary_key=True)
+    fk_id_pagamento = db.Column(db.Integer, db.ForeignKey('folha_pagamento.id_pagamento'), nullable=False)
+    fk_id_provento = db.Column(db.Integer, db.ForeignKey('proventos_fpg.id_provento'), nullable=False)
+
+
+# Modelo intermediário para FolhaDeducoes
+class FolhaDeducoes(db.Model):
+    __tablename__ = 'folha_deducoes'
+
+    id = db.Column(db.Integer, primary_key=True)
+    fk_id_pagamento = db.Column(db.Integer, db.ForeignKey('folha_pagamento.id_pagamento'), nullable=False)
+    fk_id_deducao = db.Column(db.Integer, db.ForeignKey('deducoes_fpg.id_deducao'), nullable=False)
+
+
+
+# ROTAS
 
 @app.route('/')
 def index():
@@ -114,8 +161,7 @@ def lista_de_funcionarios():
     ).outerjoin(Departamentos, Funcionarios.fk_id_departamento == Departamentos.id_departamento).all()
 
     for funcionario, departamento in lista_func:
-        print(f"Funcionário: {
-              funcionario.pessoa.nome}, Departamento: {departamento}")
+        print(f"Funcionário: {funcionario.pessoa.nome}, Departamento: {departamento}, Status {funcionario.status_func}")
 
     return render_template('lista.html', lista_func=lista_func, titulo="Lista de Funcionários")
 
@@ -265,7 +311,6 @@ def atualizar_informacoes():
     """# Pode ser obtido de um select
     departamento = Departamentos.query.filter_by(
         nome_departamento=request.form['departamento']).first()"""
-
 
     # Atualiza o departamento usando o ID do departamento enviado
     departamento_id = request.form['departamento']
