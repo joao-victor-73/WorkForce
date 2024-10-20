@@ -24,20 +24,29 @@ class StatusFunc(enum.Enum):
     ATESTADO = "ATESTADO"
 
 
+class StatusTipo(enum.Enum):
+    HORISTA = "HORISTA"
+    FOLGUISTA = "FOLGUISTA"
+    INTERMITENTE = "INTERMITENTE"
+    MENSALISTA = "MENSALISTA"
+    PJ = "PJ"
+
+
 class Departamentos(db.Model):
     __tablename__ = 'departamentos'
 
     id_departamento = db.Column(db.Integer, primary_key=True)
     nome_departamento = db.Column(db.String(100), nullable=False)
-    fk_id_func = db.Column(db.Integer, db.ForeignKey('funcionarios.id_func'))  # Supervisor
+    fk_id_func = db.Column(db.Integer, db.ForeignKey(
+        'funcionarios.id_func'))  # Supervisor
 
     # Relacionamento com a tabela de funcionários (funcionários do departamento)
-    funcionarios = db.relationship('Funcionarios', backref='departamento', lazy=True, foreign_keys='Funcionarios.fk_id_departamento')
+    funcionarios = db.relationship('Funcionarios', backref='departamento',
+                                   lazy=True, foreign_keys='Funcionarios.fk_id_departamento')
 
     # Relacionamento com o supervisor do departamento
-    supervisor = db.relationship('Funcionarios', backref='departamentos_supervisionados', foreign_keys=[fk_id_func])
-
-
+    supervisor = db.relationship(
+        'Funcionarios', backref='departamentos_supervisionados', foreign_keys=[fk_id_func])
 
     def __repr__(self):
         return f'<Departamento {self.nome_departamento}>'
@@ -66,17 +75,21 @@ class Funcionarios(db.Model):
     __tablename__ = 'funcionarios'
 
     id_func = db.Column(db.Integer, primary_key=True)
-    fk_id_pessoa = db.Column(db.Integer, db.ForeignKey('pessoas.id_pessoa'), nullable=False)
+    fk_id_pessoa = db.Column(db.Integer, db.ForeignKey(
+        'pessoas.id_pessoa'), nullable=False)
     email = db.Column(db.String(100))
-    data_contratacao = db.Column(db.Date, nullable=False, default=datetime.now(timezone.utc))
+    data_contratacao = db.Column(
+        db.Date, nullable=False, default=datetime.now(timezone.utc))
     nome_cargo = db.Column(db.String(100))
-    status_func = db.Column(db.Enum('EFETIVO', 'FERIAS', 'DEMITIDO', 'ATESTADO'), nullable=False, default='EFETIVO')
+    status_func = db.Column(db.Enum(
+        'EFETIVO', 'FERIAS', 'DEMITIDO', 'ATESTADO'), nullable=False, default='EFETIVO')
 
-    fk_id_departamento = db.Column(db.Integer, db.ForeignKey('departamentos.id_departamento'))
+    fk_id_departamento = db.Column(
+        db.Integer, db.ForeignKey('departamentos.id_departamento'))
 
     # Relacionamento com folha de pagamento
-    folha_pagamento = db.relationship('Folha_pagamento', backref='funcionarios', lazy=True)
-
+    folha_pagamento = db.relationship(
+        'Folha_pagamento', backref='funcionarios', lazy=True)
 
     def __repr__(self):
         return f'<Funcionario {self.nome_cargo}>'
@@ -106,16 +119,21 @@ class Folha_pagamento(db.Model):
 
     id_pagamento = db.Column(db.Integer, primary_key=True)
     data_pagamento = db.Column(db.Date, nullable=False)
-    tipo = db.Column(db.Enum('HORISTA', 'FOLGUISTA', 'INTERMITENTE', 'MENSALISTA', 'PJ'), nullable=False, default='HORISTA')
+    tipo = db.Column(db.Enum('HORISTA', 'FOLGUISTA', 'INTERMITENTE',
+                     'MENSALISTA', 'PJ'), nullable=False, default='HORISTA')
     num_banco = db.Column(db.String(100))
     num_agencia = db.Column(db.String(50))
     conta_deposito = db.Column(db.String(50))
-    salario_base = db.Column(db.Numeric(10, 2), nullable=False, default=1414.00)
+    salario_base = db.Column(db.Numeric(
+        10, 2), nullable=False, default=1414.00)
 
     # Relacionamentos
-    fk_id_func = db.Column(db.Integer, db.ForeignKey('funcionarios.id_func'), nullable=False)
-    fk_id_proventos = db.Column(db.Integer, db.ForeignKey('proventos_fpg.id_provento'))
-    fk_id_deducoes = db.Column(db.Integer, db.ForeignKey('deducoes_fpg.id_deducao'))
+    fk_id_func = db.Column(db.Integer, db.ForeignKey(
+        'funcionarios.id_func'), nullable=False)
+    fk_id_proventos = db.Column(
+        db.Integer, db.ForeignKey('proventos_fpg.id_provento'))
+    fk_id_deducoes = db.Column(
+        db.Integer, db.ForeignKey('deducoes_fpg.id_deducao'))
 
     def __repr__(self):
         return '<Name %r>' % self.name
@@ -129,8 +147,10 @@ class FolhaProventos(db.Model):
     __tablename__ = 'folha_proventos'
 
     id = db.Column(db.Integer, primary_key=True)
-    fk_id_pagamento = db.Column(db.Integer, db.ForeignKey('folha_pagamento.id_pagamento'), nullable=False)
-    fk_id_provento = db.Column(db.Integer, db.ForeignKey('proventos_fpg.id_provento'), nullable=False)
+    fk_id_pagamento = db.Column(db.Integer, db.ForeignKey(
+        'folha_pagamento.id_pagamento'), nullable=False)
+    fk_id_provento = db.Column(db.Integer, db.ForeignKey(
+        'proventos_fpg.id_provento'), nullable=False)
 
 
 # Modelo intermediário para FolhaDeducoes
@@ -138,9 +158,10 @@ class FolhaDeducoes(db.Model):
     __tablename__ = 'folha_deducoes'
 
     id = db.Column(db.Integer, primary_key=True)
-    fk_id_pagamento = db.Column(db.Integer, db.ForeignKey('folha_pagamento.id_pagamento'), nullable=False)
-    fk_id_deducao = db.Column(db.Integer, db.ForeignKey('deducoes_fpg.id_deducao'), nullable=False)
-
+    fk_id_pagamento = db.Column(db.Integer, db.ForeignKey(
+        'folha_pagamento.id_pagamento'), nullable=False)
+    fk_id_deducao = db.Column(db.Integer, db.ForeignKey(
+        'deducoes_fpg.id_deducao'), nullable=False)
 
 
 # ROTAS
@@ -161,7 +182,8 @@ def lista_de_funcionarios():
     ).outerjoin(Departamentos, Funcionarios.fk_id_departamento == Departamentos.id_departamento).all()
 
     for funcionario, departamento in lista_func:
-        print(f"Funcionário: {funcionario.pessoa.nome}, Departamento: {departamento}, Status {funcionario.status_func}")
+        print(f"Funcionário: {funcionario.pessoa.nome}, Departamento: {
+              departamento}, Status {funcionario.status_func}")
 
     return render_template('lista.html', lista_func=lista_func, titulo="Lista de Funcionários")
 
@@ -202,7 +224,19 @@ def criando_funcionario():
     fk_id_departamento = request.form['departamento']  # Aqui você pega o ID
 
     status = request.form['status']
-    status_enum = StatusFunc[status]  # convertendo a string para o Enum
+    print(f'Status recebido do formulário: {status}')  # Verifique o valor aqui
+    status_enum = StatusFunc[status]
+    print(f'Status convertido para Enum: {status_enum}')  # Verifique o valor do Enum
+
+    # Requisitando as INFORMAÇÕES DE PAGAMENTO:
+    num_banco = request.form['num_banco']
+    num_agencia = request.form['num_agencia']
+    conta_deposito = request.form['conta_deposito']
+    salario_base = request.form['salario_base']
+    data_pagamento = request.form['data_pagamento']
+
+    tipo_contratacao = request.form['tipo_contratacao']
+    tipo_contratacao_enum = StatusTipo[tipo_contratacao]
 
     # Aqui faremos uma consulta ao banco de dados utilizando o método 'query', para assim
     # tentarmos encontrar por meio do cpf se já tem algum registro de pessoa.
@@ -232,8 +266,15 @@ def criando_funcionario():
 
     print("ADICIONAND PESSOA NA TABELA")
     # Adicionando a nova pessoa ao banco
-    db.session.add(nova_pessoa)
-    db.session.commit()
+
+    try:
+        db.session.add(nova_pessoa)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        print("Erro ao adicionar uma nova pessoa:", e)
+        flash('Erro ao cadastrar uma nova pessoa.')
+        return redirect(url_for('lista_de_funcionarios'))
 
     # Buscando o departamento
     departamento_obj = Departamentos.query.filter_by(
@@ -251,16 +292,41 @@ def criando_funcionario():
     novo_funcionario = Funcionarios(fk_id_pessoa=nova_pessoa.id_pessoa,
                                     email=email,
                                     data_contratacao=data_contratacao,
-                                    salario=salario,
                                     nome_cargo=cargo,
-                                    status_func=status_enum,
+                                    status_func=status_enum.value,
                                     fk_id_departamento=departamento_obj.id_departamento)
 
     # Salvando o novo_funcionario no banco de dados
     # o objeto novo_funcionario é adicionado à sessão do banco de dados.
-    db.session.add(novo_funcionario)
-    # Aqui, as mudanças, que são a inserção de um novo registro, são confirmadas/comitadas.
-    db.session.commit()
+    try:
+        db.session.add(novo_funcionario)
+        # Aqui, as mudanças, que são a inserção de um novo registro, são confirmadas/comitadas.
+        db.session.commit()
+
+    except Exception as e:
+        db.session.rollback()
+        print("Erro ao adicionar uma nova pessoa:", e)
+        flash('Erro ao cadastrar uma nova pessoa.')
+        return redirect(url_for('lista_de_funcionarios'))
+
+    if novo_funcionario.id_func:
+        nova_folha_pagamento = Folha_pagamento(fk_id_func=novo_funcionario.id_func,
+                                               salario_base=salario_base,
+                                               num_agencia=num_agencia,
+                                               num_banco=num_banco,
+                                               conta_deposito=conta_deposito,
+                                               data_pagamento=data_pagamento,
+                                               tipo=tipo_contratacao_enum.value)
+
+        try:
+            db.session.add(nova_folha_pagamento)
+            db.session.commit()
+            
+        except Exception as e:
+            db.session.rollback()
+            print("Erro ao adicionar uma nova pessoa:", e)
+            flash('Erro ao cadastrar uma nova pessoa.')
+            return redirect(url_for('lista_de_funcionarios'))
 
     flash('Funcionário cadastrado com sucesso!')
     print("REDIRECIONANDO PARA A LISTA DE FUNCIONÁRIOS")
@@ -331,7 +397,6 @@ def atualizar_informacoes():
 def funcionario_detalhes(id_func):
     funcionario = Funcionarios.query.get_or_404(id_func)
     return render_template('funcionario_detalhes.html', funcionario=funcionario)
-
 
 
 if __name__ == '__main__':

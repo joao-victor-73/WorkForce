@@ -85,8 +85,62 @@
                     </select>
                 </div>
 
+                <br>
+
+                <h2>Informações Salariais</h2>
+
+                <div class="textfield">
+                    <label for="num_banco">Número do banco: </label>
+                    <input type="text" name="num_banco" required>
+                </div>
+
+                <div class="textfield">
+                    <label for="num_agencia">Número da agência: </label>
+                    <input type="text" name="num_agencia" required>
+                </div>
+
+                <div class="textfield">
+                    <label for="conta_deposito">Conta de deposito: </label>
+                    <input type="text" name="conta_deposito" required>
+                </div>
+
+                <div class="textfield">
+                    <label for="salario_base">Salário Base:</label>
+                    <input type="number" id="salario_base" name="salario_base" placeholder="Digite o salário" step="0.01" min="0" required>
+                </div>
+
+                <div class="textfield">
+                    <label for="data_pagamento">Data de Pagamento:</label>
+                    <input type="date" name="data_pagamento">
+                </div>
+
+                <div class="textfield">
+                    <label for="tipo_contratacao">Tipo:</label>
+                    <select name="tipo_contratacao">
+                        <option value="HORISTA">Horista</option>
+                        <option value="FOLGUISTA">Folguista</option>
+                        <option value="INTERMITENTE">Intermitente</option>
+                        <option value="MENSALISTA">Mensalista</option>
+                        <option value="PJ">PJ</option>
+                    </select>
+                </div>
+
+
+
+
                 <button type="submit">Cadastrar Funcionário</button>
             </form>
+            
+            <script>
+                document.getElementById('salario_base').addEventListener('input', function (event) {
+                    var valor = event.target.value;
+                    if (valor < 0) {
+                        alert("O salário não pode ser negativo.");
+                        event.target.value = 0;
+                    }
+                });
+            </script>
+            
         </div>
     </div>
 
