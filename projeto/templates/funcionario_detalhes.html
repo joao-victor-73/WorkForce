@@ -4,7 +4,7 @@
 
 <div class="card">
     <div class="card-header">
-        <h3>Detalhes do Funcionário</h3>
+        <h3>Informações Pessoais</h3>
     </div>
     <div class="card-body">
         <h5 class="card-title">{{ funcionario.pessoa.nome }}</h5>
@@ -16,6 +16,26 @@
         <p><strong>Departamento:</strong> {{ funcionario.departamento.nome_departamento if funcionario.departamento else 'Nenhum' }}</p>
         <!-- Adicione mais informações conforme necessário -->
     </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3>Informações Salariais</h3>
+    </div>
+    <div class="card-body">
+        {% if folha_pagamento %}
+        <p><strong>Salário Base:</strong> R$ {{ folha_pagamento.salario_base }}</p>
+        <p><strong>Data de Pagamento:</strong> {{ folha_pagamento.data_pagamento.strftime('%d/%m/%y') }}</p>
+        <p><strong>Tipo de Contratação:</strong> {{ folha_pagamento.tipo.value }}</p>
+        <p><strong>Banco:</strong> {{ folha_pagamento.num_banco }}</p>
+        <p><strong>Agência:</strong> {{ folha_pagamento.num_agencia }}</p>
+        <p><strong>Conta para Depósito:</strong> {{ folha_pagamento.conta_deposito }}</p>
+    {% else %}
+        <p>Nenhuma informação de salário encontrada.</p>
+    {% endif %}
+    </div>
+
+
     <div class="card-footer">
         <a href="{{ url_for('lista_de_funcionarios') }}" class="btn btn-secondary">Voltar</a>
     </div>

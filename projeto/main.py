@@ -226,7 +226,8 @@ def criando_funcionario():
     status = request.form['status']
     print(f'Status recebido do formulário: {status}')  # Verifique o valor aqui
     status_enum = StatusFunc[status]
-    print(f'Status convertido para Enum: {status_enum}')  # Verifique o valor do Enum
+    # Verifique o valor do Enum
+    print(f'Status convertido para Enum: {status_enum}')
 
     # Requisitando as INFORMAÇÕES DE PAGAMENTO:
     num_banco = request.form['num_banco']
@@ -321,7 +322,7 @@ def criando_funcionario():
         try:
             db.session.add(nova_folha_pagamento)
             db.session.commit()
-            
+
         except Exception as e:
             db.session.rollback()
             print("Erro ao adicionar uma nova pessoa:", e)
@@ -396,7 +397,11 @@ def atualizar_informacoes():
 @app.route('/funcionario/<int:id_func>')
 def funcionario_detalhes(id_func):
     funcionario = Funcionarios.query.get_or_404(id_func)
-    return render_template('funcionario_detalhes.html', funcionario=funcionario)
+    folha_pagamento = funcionario.folha_pagamento
+
+    folha_pagamento_mais_recente = folha_pagamento[-1] if folha_pagamento else None
+
+    return render_template('funcionario_detalhes.html', funcionario=funcionario, folha_pagamento=folha_pagamento_mais_recente)
 
 
 if __name__ == '__main__':
