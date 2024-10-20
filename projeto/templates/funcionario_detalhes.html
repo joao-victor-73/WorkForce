@@ -38,7 +38,9 @@
 
     <div class="card-footer">
         <a href="{{ url_for('lista_de_funcionarios') }}" class="btn btn-secondary">Voltar</a>
+        <a href="{{ url_for('editar_informacoes', id_func=funcionario.id_func) }}" class="btn btn-secondary">Editar</a>
     </div>
+
 </div>
 
 {% endblock %}
