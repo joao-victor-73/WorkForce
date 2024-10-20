@@ -342,20 +342,24 @@ def editar_informacoes(id_func):
     # funcionario = Funcionarios.query.filter_by(id_func=id_func)
     # pessoa = Pessoas.query.filter_by(id_pessoa=funcionario.fk_id_pessoa)
 
-    funcionario = Funcionarios.query.get_or_404(
-        id_func)  # Obtendo diretamente pelo ID
+    # Obtém o `funcionário` e a `pessoa` associada (Obtendo diretamente pelo ID)
+    funcionario = Funcionarios.query.get_or_404(id_func)
     pessoa = Pessoas.query.get_or_404(funcionario.fk_id_pessoa)
+
+    # Obtém todos os departamentos para o select de departamentos
     departamentos = Departamentos.query.all()
 
-    return render_template("editar.html", titulo="Cadastrar Funcionário", funcionario=funcionario, pessoa=pessoa, departamentos=departamentos)
+    # Verifica se o funcionário tem uma folha de pagamento associada
+    folha_pagamento = Folha_pagamento.query.filter_by(fk_id_func=id_func).first()
+
+    return render_template("editar.html", titulo="Editar Informações", funcionario=funcionario, pessoa=pessoa, departamentos=departamentos, folha_pagamento=folha_pagamento)
 
 
 @app.route('/atualizar_informacoes', methods=['POST',])
 def atualizar_informacoes():
 
     # Atualiza as informações pessoais
-    atualiza_pessoa = Pessoas.query.filter_by(
-        id_pessoa=request.form['id_pessoa']).first()
+    atualiza_pessoa = Pessoas.query.filter_by(id_pessoa=request.form['id_pessoa']).first()
 
     atualiza_pessoa.nome = request.form['nome']
     atualiza_pessoa.cpf = request.form['cpf']
@@ -365,13 +369,12 @@ def atualizar_informacoes():
     atualiza_pessoa.endereco = request.form['endereco']
     atualiza_pessoa.cidade = request.form['cidade']
 
+
     # Atualiza as informações de emprego
-    atualiza_emprego = Funcionarios.query.filter_by(
-        id_func=request.form['id_func']).first()
+    atualiza_emprego = Funcionarios.query.filter_by(id_func=request.form['id_func']).first()
 
     atualiza_emprego.email = request.form['email']
     atualiza_emprego.data_contratacao = request.form['data_contratacao']
-    atualiza_emprego.salario = request.form['salario']
     atualiza_emprego.nome_cargo = request.form['cargo']
     atualiza_emprego.status_func = request.form['status']
 
@@ -382,6 +385,17 @@ def atualizar_informacoes():
     # Atualiza o departamento usando o ID do departamento enviado
     departamento_id = request.form['departamento']
     atualiza_emprego.fk_id_departamento = departamento_id
+
+    # Atualizar informações salariais
+    if 'id_pagamento' in request.form:
+        folha_pagamento = Folha_pagamento.query.filter_by(id_folha=request.form['id_pagamento']).first()
+        folha_pagamento.salario_base = request.form['salario_base']
+        folha_pagamento.num_banco = request.form['num_banco']
+        folha_pagamento.num_agencia = request.form['num_agencia']
+        folha_pagamento.conta_deposito = request.form['conta_deposito']
+        db.session.add(folha_pagamento)
+
+
 
     # Salva as alterações no banco de dados
     db.session.add(atualiza_pessoa)
@@ -394,7 +408,7 @@ def atualizar_informacoes():
 
 
 # Rota para mostrar todas as informações do funcionário
-@app.route('/funcionario/<int:id_func>')
+@app.route('/funcionario_detalhes/<int:id_func>')
 def funcionario_detalhes(id_func):
     funcionario = Funcionarios.query.get_or_404(id_func)
     folha_pagamento = funcionario.folha_pagamento
