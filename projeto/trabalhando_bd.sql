@@ -11,6 +11,13 @@ CREATE TABLE departamentos (
 	id_departamento INT PRIMARY KEY AUTO_INCREMENT,
     nome_departamento VARCHAR(100) NOT NULL,
     fk_id_func INT -- Supervisor também é um funcionário
+
+    CONSTRAINT fk_departamento_funcionario
+        FOREIGN KEY (fk_id_func) 
+        REFERENCES funcionarios(id_func) 
+        ON DELETE SET NULL 
+        ON UPDATE CASCADE
+
 );
 
 
@@ -83,25 +90,11 @@ CREATE TABLE folha_pagamento (
     conta_deposito VARCHAR(50),
     salario_base DECIMAL(10, 2) NOT NULL DEFAULT 1414.00,
     fk_id_func INT,
-    fk_id_proventos INT,
-    fk_id_deducoes INT,
     
     CONSTRAINT fk_folhaPagamento_funcionario 
 		FOREIGN KEY (fk_id_func) 
         REFERENCES funcionarios (id_func) 
         ON DELETE CASCADE 
-        ON UPDATE CASCADE,
-        
-	CONSTRAINT fk_folhaPagamento_Deducoes
-		FOREIGN KEY (fk_id_deducoes)
-        REFERENCES deducoes_fpg (id_deducao)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-	
-    CONSTRAINT fk_folhaPagamento_Proventos
-		FOREIGN KEY (fk_id_proventos)
-        REFERENCES proventos_fpg (id_provento)
-        ON DELETE CASCADE
         ON UPDATE CASCADE
 );
 

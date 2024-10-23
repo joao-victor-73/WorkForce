@@ -49,6 +49,13 @@ TABLES['departamentos'] = ('''
             `id_departamento` INT PRIMARY KEY AUTO_INCREMENT,
             `nome_departamento` VARCHAR(100) NOT NULL,
             `fk_id_func` INT -- Supervisor também é um funcionário
+            
+            CONSTRAINT `fk_departamento_funcionario`
+                FOREIGN KEY (`fk_id_func`) 
+                REFERENCES funcionarios(`id_func`) 
+                ON DELETE SET NULL 
+                ON UPDATE CASCADE
+
         );''')
 
 
