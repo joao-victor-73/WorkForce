@@ -217,7 +217,6 @@ def criando_funcionario():
     # Requisitando as INFORMAÇÕES DO EMPREGO:
     email = request.form['email']
     data_contratacao = request.form['data_contratacao']
-    salario = request.form['salario']
     cargo = request.form['cargo']
 
     # Usando o ID do departamento diretamente do formulário
