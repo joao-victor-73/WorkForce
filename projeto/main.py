@@ -182,8 +182,7 @@ def lista_de_funcionarios():
     ).outerjoin(Departamentos, Funcionarios.fk_id_departamento == Departamentos.id_departamento).all()
 
     for funcionario, departamento in lista_func:
-        print(f"Funcionário: {funcionario.pessoa.nome}, Departamento: {
-              departamento}, Status {funcionario.status_func}")
+        print(f"Funcionário: {funcionario.pessoa.nome}, Departamento: {departamento}, Status {funcionario.status_func}")
 
     return render_template('lista.html', lista_func=lista_func, titulo="Lista de Funcionários")
 
@@ -229,7 +228,7 @@ def criando_funcionario():
     print(f'Status convertido para Enum: {status_enum}')
 
     # Requisitando as INFORMAÇÕES DE PAGAMENTO:
-    num_banco = request.form['num_banco']
+    num_banco = request.form['num_banco'] # tem que alterar para nome_banco
     num_agencia = request.form['num_agencia']
     conta_deposito = request.form['conta_deposito']
     salario_base = request.form['salario_base']
@@ -313,7 +312,7 @@ def criando_funcionario():
         nova_folha_pagamento = Folha_pagamento(fk_id_func=novo_funcionario.id_func,
                                                salario_base=salario_base,
                                                num_agencia=num_agencia,
-                                               num_banco=num_banco,
+                                               num_banco=num_banco, # tem que alterar para nome_banco
                                                conta_deposito=conta_deposito,
                                                data_pagamento=data_pagamento,
                                                tipo=tipo_contratacao_enum.value)
@@ -389,7 +388,7 @@ def atualizar_informacoes():
     if 'id_pagamento' in request.form:
         folha_pagamento = Folha_pagamento.query.filter_by(id_folha=request.form['id_pagamento']).first()
         folha_pagamento.salario_base = request.form['salario_base']
-        folha_pagamento.num_banco = request.form['num_banco']
+        folha_pagamento.num_banco = request.form['num_banco'] # tem que alterar para nome_banco
         folha_pagamento.num_agencia = request.form['num_agencia']
         folha_pagamento.conta_deposito = request.form['conta_deposito']
         db.session.add(folha_pagamento)
@@ -416,6 +415,30 @@ def funcionario_detalhes(id_func):
 
     return render_template('funcionario_detalhes.html', funcionario=funcionario, folha_pagamento=folha_pagamento_mais_recente)
 
+
+# Rota para deletar o cadastro de um funcionário
+@app.route('/deletar/<int:id_func>')
+def deletar_informacoes(id_func):
+    funcionario = Funcionarios.query.get_or_404(id_func)
+        
+    try:
+        # Recupera e exclui o funcionário e suas informações associadas
+        pessoa = Pessoas.query.get(funcionario.fk_id_pessoa)
+        db.session.delete(funcionario)
+        db.session.commit()
+
+        # Exclui também o registro pessoal associado
+        db.session.delete(pessoa)
+        db.session.commit()
+
+        flash("Funcionário e informações associadas excluídos com sucesso.", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash("Erro ao tentar excluir o funcionário.", "danger")
+    
+    # Redireciona para a lista de funcionários após exclusão
+    return redirect(url_for('lista_de_funcionarios'))
+    
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)

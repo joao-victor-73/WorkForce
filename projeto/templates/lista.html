@@ -24,7 +24,10 @@
                     <td>{{ funcionario.nome_cargo }}</td>
                     <td>{{ funcionario.data_contratacao.strftime('%d/%m/%y') }}</td> <!-- Formatando o tipo de data -->
                     <td>{{ funcionario.status_func.value }}</td> <!-- Acessa o valor do Enumm -->
-                    <td> <a href="{{ url_for('editar_informacoes', id_func=funcionario.id_func) }}">Editar</a> </td>
+                    <td> 
+                        <a href="{{ url_for('editar_informacoes', id_func=funcionario.id_func) }}">Editar</a> 
+                        <a href="{{ url_for('deletar_informacoes', id_func=funcionario.id_func) }}">Deletar</a> 
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>

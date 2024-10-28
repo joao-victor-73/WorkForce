@@ -126,7 +126,7 @@ TABLES['folha_pagamento'] = ('''
         `id_pagamento` INT PRIMARY KEY AUTO_INCREMENT,
         `data_pagamento` DATE NOT NULL,
         `tipo` ENUM('HORISTA', 'FOLGUISTA', 'INTERMITENTE', 'MENSALISTA', 'PJ') NOT NULL DEFAULT 'HORISTA',
-        `num_banco` VARCHAR(100),
+        `nome_banco` VARCHAR(100),
         `num_agencia` VARCHAR(50),
         `conta_deposito` VARCHAR(50),
         `salario_base` DECIMAL(10, 2) NOT NULL DEFAULT 1414.00,
@@ -276,9 +276,9 @@ cursor.executemany(deducoes_fpg_query_sql, deducoes_fpg)
 
 folha_pagamento_query_sql = 'INSERT INTO folha_pagamento (data_pagamento, tipo, num_banco, num_agencia, conta_deposito, salario_base, fk_id_func, fk_id_proventos, fk_id_deducoes) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'
 folha_pagamentos = [
-    ('2024-10-05', 'MENSALISTA', '001', '1234-5', '987654', 3000.00, 1, 1, 1),
-    ('2024-10-05', 'MENSALISTA', '237', '4321-0', '123456', 3000.00, 2, 2, 2),
-    ('2024-10-05', 'MENSALISTA', '104', '5678-9', '654321', 3000.00, 3, 3, 3)
+    ('2024-10-05', 'MENSALISTA', 'Banco do Brasil','1234-5', '987654', 3000.00, 1, 1, 1),
+    ('2024-10-05', 'MENSALISTA', 'Bradesco', '4321-0', '123456', 3000.00, 2, 2, 2),
+    ('2024-10-05', 'MENSALISTA', 'Bradesco', '5678-9', '654321', 3000.00, 3, 3, 3)
 ]
 cursor.executemany(folha_pagamento_query_sql, folha_pagamentos)
 
