@@ -15,7 +15,7 @@ except mysql.connector.Error as err:
     else:
         print(err)
 
-
+print('BANCO DE DADOS CONECTADO!')
 cursor = conectar.cursor()
 
 
@@ -33,30 +33,18 @@ cursor = conectar.cursor()
 # Caso a tabela já exista, o comando abaixo irá apaga-lá
 cursor.execute("DROP DATABASE IF EXISTS `workforce`;")
 
+print('CRIANDO DATABASE')
 # Criando a base de dados e usando-a
 cursor.execute("CREATE DATABASE `workforce`;")
 cursor.execute("USE `workforce`;")
+
+print('DATABASE CRIADO')
 
 
 # Criando as tabelas necessárias (criando através do mysql-connector):
 
 # cria-se um dicionário, onde a chave é no nome da table e o valor é a instrução SQL.
 TABLES = {}
-
-# Criando tabela departamentos
-TABLES['departamentos'] = ('''
-        CREATE TABLE departamentos (
-            `id_departamento` INT PRIMARY KEY AUTO_INCREMENT,
-            `nome_departamento` VARCHAR(100) NOT NULL,
-            `fk_id_func` INT -- Supervisor também é um funcionário
-            
-            CONSTRAINT `fk_departamento_funcionario`
-                FOREIGN KEY (`fk_id_func`) 
-                REFERENCES funcionarios(`id_func`) 
-                ON DELETE SET NULL 
-                ON UPDATE CASCADE
-
-        );''')
 
 
 # Criando tabela pessoas
@@ -68,8 +56,11 @@ TABLES['pessoas'] = ('''
         `data_nascimento` DATE,
         `tel1` VARCHAR(20),
         `tel2` VARCHAR(20),
-        `endereco` VARCHAR(100),
-        `cidade` VARCHAR(30)
+        `rua` VARCHAR(100),
+        `bairro` VARCHAR(50),
+        `num_residencia` VARCHAR(10),
+        `cidade` VARCHAR(30),
+        `cep` VARCHAR(15)
     );
 ''')
 
@@ -89,14 +80,23 @@ TABLES['funcionarios'] = ('''
             FOREIGN KEY (`fk_id_pessoa`) 
             REFERENCES pessoas (`id_pessoa`) 
             ON DELETE CASCADE 
-            ON UPDATE CASCADE,
+            ON UPDATE CASCADE
+    );''')
+
+
+# Criando tabela departamentos
+TABLES['departamentos'] = ('''
+    CREATE TABLE departamentos (
+        `id_departamento` INT PRIMARY KEY AUTO_INCREMENT,
+        `nome_departamento` VARCHAR(100) NOT NULL,
+        `fk_id_func` INT, -- Supervisor também é um funcionário
         
-        CONSTRAINT `fk_funcionario_departamento` 
-            FOREIGN KEY (`fk_id_departamento`) 
-            REFERENCES departamentos (`id_departamento`) 
+        CONSTRAINT `fk_departamento_funcionario`
+            FOREIGN KEY (`fk_id_func`) 
+            REFERENCES funcionarios (`id_func`) 
             ON DELETE SET NULL 
             ON UPDATE CASCADE
-    ); ''')
+    );''')
 
 
 # As duas tabelas abaixo serviram para informar sobre proventos e deduções, e a
@@ -124,34 +124,22 @@ TABLES['deducoes_fpg'] = ('''
 TABLES['folha_pagamento'] = ('''
     CREATE TABLE folha_pagamento (
         `id_pagamento` INT PRIMARY KEY AUTO_INCREMENT,
-        `data_pagamento` DATE NOT NULL,
-        `tipo` ENUM('HORISTA', 'FOLGUISTA', 'INTERMITENTE', 'MENSALISTA', 'PJ') NOT NULL DEFAULT 'HORISTA',
+        `data_pagamento` VARCHAR(15) NOT NULL,
+        `tipo` ENUM('HORISTA', 'FOLGUISTA', 'INTERMITENTE', 'MENSALISTA') NOT NULL DEFAULT 'HORISTA',
         `nome_banco` VARCHAR(100),
         `num_agencia` VARCHAR(50),
         `conta_deposito` VARCHAR(50),
         `salario_base` DECIMAL(10, 2) NOT NULL DEFAULT 1414.00,
         `fk_id_func` INT,
-        `fk_id_proventos` INT,
-        `fk_id_deducoes` INT,
+        `geracao_folha` DATETIME DEFAULT CURRENT_TIMESTAMP,
         
         CONSTRAINT `fk_folhaPagamento_funcionario` 
             FOREIGN KEY (`fk_id_func`) 
             REFERENCES funcionarios (`id_func`) 
             ON DELETE CASCADE 
-            ON UPDATE CASCADE,
-            
-        CONSTRAINT `fk_folhaPagamento_Deducoes`
-            FOREIGN KEY (`fk_id_deducoes`)
-            REFERENCES deducoes_fpg (`id_deducao`)
-            ON DELETE CASCADE
-            ON UPDATE CASCADE,
-        
-        CONSTRAINT `fk_folhaPagamento_Proventos`
-            FOREIGN KEY (`fk_id_proventos`)
-            REFERENCES proventos_fpg (`id_provento`)
-            ON DELETE CASCADE
             ON UPDATE CASCADE
     ); ''')
+
 
 # CRIAÇÃO DE TABELAS INTERMEDIARIAS
 # As tabelas intermediárias vão relacionar múltiplos proventos e deduções
@@ -212,6 +200,19 @@ for tabela_nome in TABLES:
         print('OK')
 
 
+# Alterar a tabela funcionários para aceitar a F.K. de Departamentos
+alter_table_funcionarios = '''
+    ALTER TABLE funcionarios
+    ADD CONSTRAINT fk_funcionario_departamento
+        FOREIGN KEY(fk_id_departamento)
+        REFERENCES departamentos(id_departamento)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE
+'''
+cursor.execute(alter_table_funcionarios)
+conectar.commit()
+
+
 # INSERINDO REGISTROS FICTICIOS NAS TABELAS
 
 """
@@ -222,22 +223,24 @@ indicar onde os valores devem ser inseridos de forma segura.
 departamento_query_sql = 'INSERT INTO departamentos (nome_departamento) VALUES (%s)'
 departamentos = [
     ('Recursos Humanos', ),
-    ('Tecnologia da Informação', ),
-    ('Marketing', ),
-    ('Vendas', )
+    ('Financeiro', ),
+    ('T.I.', ),
+    ('Transporte', ),
+    ('Comercial', )
 ]
 cursor.executemany(departamento_query_sql, departamentos)
 # o método `executemany` serve para executar a inserção de vários registros de uma única vez.
 
 
-pessoas_query_sql = 'INSERT INTO pessoas (nome, cpf, data_nascimento, tel1, tel2, endereco, cidade) VALUES (%s, %s, %s, %s, %s, %s, %s)'
+pessoas_query_sql = 'INSERT INTO pessoas (nome, cpf, data_nascimento, tel1, tel2, rua, bairro, num_residencia, cidade, cep) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
 pessoas = [
-    ('Carlos Silva', '123.456.789-00', '1985-06-15',
-     '11999999999', None, 'Rua A, 100', 'São Paulo'),
-    ('Ana Costa', '987.654.321-00', '1990-09-20', '11988888888',
-     '1133333333', 'Rua B, 200', 'Rio de Janeiro'),
-    ('Bruno Oliveira', '456.789.123-00', '1982-11-30',
-     '11977777777', None, 'Rua C, 300', 'Curitiba')
+    ('Alice Silva', '123.456.789-00', '1990-05-21', '(11) 91234-5678',
+     '(11) 92345-6789', 'Rua das Flores', 'Centro', '123', 'São Paulo', '01001-000'),
+    ('Carlos Pereira', '987.654.321-00', '1985-11-15', '(11) 99876-5432',
+     None, 'Av. Paulista', 'Bela Vista', '456', 'São Paulo', '20040-001'),
+    ('Rafaela Silvana Junior', '655.321.888-78', '1998-06-20', '(11) 99774-8552',
+     None, 'Av. Paulista', 'Bela Vista', '23', 'São Paulo', '20040-001')
+
 ]
 cursor.executemany(pessoas_query_sql, pessoas)
 # OBS: precisa-se colocar uma virgula após o valor, porque para o `executemany`, espera-se uma lista de tuplas.
@@ -247,59 +250,59 @@ cursor.executemany(pessoas_query_sql, pessoas)
 
 funcionarios_query_sql = 'INSERT INTO funcionarios (fk_id_pessoa, email, data_contratacao, nome_cargo, status_func, fk_id_departamento) VALUES (%s, %s, %s, %s, %s, %s)'
 funcionarios = [
-    (1, 'carlos.silva@empresa.com', '2022-01-15', 'Gerente de RH', 'EFETIVO', 1),
-    (2, 'ana.costa@empresa.com', '2023-02-01',
-     'Analista de Sistemas', 'EFETIVO', 2),
-    (3, 'bruno.oliveira@empresa.com', '2021-07-10',
-     'Coordenador de Marketing', 'EFETIVO', 3)
+    (1, 'alice.silva@empresa.com', '2023-01-10', 'Analista de RH', 'EFETIVO', 1),
+    (2, 'carlos.pereira@empresa.com', '2022-06-05', 'Contador', 'EFETIVO', 2),
+    (3, 'rafa.ela.junior@empresa.com', '2024-10-29', 'Supervisora T.I.', 'EFETIVO', 3)
 ]
 cursor.executemany(funcionarios_query_sql, funcionarios)
 
 
 proventos_fpg_query_sql = 'INSERT INTO proventos_fpg (desc_provento, valor_provento) VALUES (%s, %s)'
 proventos_fpg = [
-    ('Salário Base', 3000.00),
-    ('Bônus por Desempenho', 500.00),
-    ('Comissão', 700.00)
+    ('Vale Alimentação', 50.00),
+    ('Bônus de Desempenho', 500.00),
+    ('Horas Extras', 200.00)
 ]
 cursor.executemany(proventos_fpg_query_sql, proventos_fpg)
 
 
 deducoes_fpg_query_sql = 'INSERT INTO deducoes_fpg (desc_deducao, valor_deducao) VALUES (%s, %s)'
 deducoes_fpg = [
-    ('INSS', 330.00),
-    ('Imposto de Renda', 250.00),
-    ('Plano de Saúde', 150.00)
+    ('INSS', 120.00),
+    ('Imposto de Renda', 50.00),
+    ('Plano de Saúde', 100.00)
 ]
 cursor.executemany(deducoes_fpg_query_sql, deducoes_fpg)
 
 
-folha_pagamento_query_sql = 'INSERT INTO folha_pagamento (data_pagamento, tipo, num_banco, num_agencia, conta_deposito, salario_base, fk_id_func, fk_id_proventos, fk_id_deducoes) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'
+folha_pagamento_query_sql = 'INSERT INTO folha_pagamento (data_pagamento, tipo, nome_banco, num_agencia, conta_deposito, salario_base, fk_id_func) VALUES (%s, %s, %s, %s, %s, %s, %s)'
 folha_pagamentos = [
-    ('2024-10-05', 'MENSALISTA', 'Banco do Brasil','1234-5', '987654', 3000.00, 1, 1, 1),
-    ('2024-10-05', 'MENSALISTA', 'Bradesco', '4321-0', '123456', 3000.00, 2, 2, 2),
-    ('2024-10-05', 'MENSALISTA', 'Bradesco', '5678-9', '654321', 3000.00, 3, 3, 3)
+    ('06-10', 'MENSALISTA', 'Banco do Brasil', '1234', '00012345-6', 1414.00, 1),
+    ('06-10', 'HORISTA', 'Bradesco', '5678', '00098765-4', 1414.00, 2),
+    ('06-10', 'HORISTA', 'Bradesco', '8899', '00014556-4', '3600.00', 3)
 ]
 cursor.executemany(folha_pagamento_query_sql, folha_pagamentos)
 
 
 folha_proventos_query_sql = 'INSERT INTO folha_proventos (fk_id_pagamento, fk_id_provento) VALUES (%s, %s)'
 folha_proventos = [
-    (1, 1),  # Provento de salário base para o pagamento 1
-    (1, 2),  # Provento de bônus para o pagamento 1
-    (2, 1),  # Provento de salário base para o pagamento 2
-    (3, 1),  # Provento de salário base para o pagamento 3
-    (3, 3)  # Provento de comissão para o pagamento 3
+    (1, 1),  # Relaciona o Salário Base com o pagamento 1
+    (1, 2),  # Relaciona o Bônus de Desempenho com o pagamento 1
+    (2, 1),  # Relaciona o Salário Base com o pagamento 2
+    (2, 3),  # Relaciona as Horas Extras com o pagamento 2
+    (3, 1),
+    (3, 2)
 ]
 cursor.executemany(folha_proventos_query_sql, folha_proventos)
 
 folha_deducoes_query_sql = ' INSERT INTO folha_deducoes (fk_id_pagamento, fk_id_deducao) VALUES (%s, %s)'
 folha_deducoes = [
-    (1, 1),  # Deducao INSS para o pagamento 1
-    (1, 2),  # Deducao IR para o pagamento 1
-    (2, 1),  # Deducao INSS para o pagamento 2
-    (3, 1),  # Deducao INSS para o pagamento 3
-    (3, 3)  # Deducao Plano de Saúde para o pagamento 3
+    (1, 1),  # Relaciona o INSS com o pagamento 1
+    (1, 2),  # Relaciona o Imposto de Renda com o pagamento 1
+    (2, 1),  # Relaciona o INSS com o pagamento 2
+    (2, 3),  # Relaciona o Plano de Saúde com o pagamento 2
+    (3, 1),
+    (3, 2)
 ]
 cursor.executemany(folha_deducoes_query_sql, folha_deducoes)
 
