@@ -25,7 +25,7 @@
     <div class="card-body">
         {% if folha_pagamento %}
         <p><strong>Salário Base:</strong> R$ {{ folha_pagamento.salario_base }}</p>
-        <p><strong>Data de Pagamento:</strong> {{ folha_pagamento.data_pagamento.strftime('%d/%m/%y') }}</p>
+        <p><strong>Data de Pagamento:</strong> {{ folha_pagamento.data_pagamento }}</p>
         <p><strong>Tipo de Contratação:</strong> {{ folha_pagamento.tipo.value }}</p>
         <p><strong>Banco:</strong> {{ folha_pagamento.num_banco }}</p>
         <p><strong>Agência:</strong> {{ folha_pagamento.num_agencia }}</p>

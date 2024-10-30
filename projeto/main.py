@@ -61,8 +61,11 @@ class Pessoas(db.Model):
     data_nascimento = db.Column(db.Date)
     tel1 = db.Column(db.String(20))
     tel2 = db.Column(db.String(20))
-    endereco = db.Column(db.String(100))
+    rua = db.Column(db.String(100))
+    bairro = db.Column(db.String(50))
+    num_residencia = db.Column(db.String(10))
     cidade = db.Column(db.String(30))
+    cep = db.Column(db.String(15))
 
     # Relacionamento com a tabela de funcionários
     funcionario = db.relationship('Funcionarios', backref='pessoa', lazy=True)
@@ -118,22 +121,18 @@ class Folha_pagamento(db.Model):
     __tablename__ = 'folha_pagamento'
 
     id_pagamento = db.Column(db.Integer, primary_key=True)
-    data_pagamento = db.Column(db.Date, nullable=False)
-    tipo = db.Column(db.Enum('HORISTA', 'FOLGUISTA', 'INTERMITENTE',
-                     'MENSALISTA', 'PJ'), nullable=False, default='HORISTA')
-    num_banco = db.Column(db.String(100))
+    data_pagamento = db.Column(db.String(15), nullable=False)
+    tipo = db.Column(db.Enum('HORISTA', 'FOLGUISTA', 'INTERMITENTE','MENSALISTA'), nullable=False, default='HORISTA')
+    nome_banco = db.Column(db.String(100))
     num_agencia = db.Column(db.String(50))
     conta_deposito = db.Column(db.String(50))
-    salario_base = db.Column(db.Numeric(
-        10, 2), nullable=False, default=1414.00)
+    salario_base = db.Column(db.Numeric(10, 2), nullable=False, default=1414.00)
+    geracao_folha = db.Column(db.Date, default=datetime.now(timezone.utc))
 
     # Relacionamentos
-    fk_id_func = db.Column(db.Integer, db.ForeignKey(
-        'funcionarios.id_func'), nullable=False)
-    fk_id_proventos = db.Column(
-        db.Integer, db.ForeignKey('proventos_fpg.id_provento'))
-    fk_id_deducoes = db.Column(
-        db.Integer, db.ForeignKey('deducoes_fpg.id_deducao'))
+    fk_id_func = db.Column(db.Integer, db.ForeignKey('funcionarios.id_func'), nullable=False)
+    fk_id_proventos = db.Column(db.Integer, db.ForeignKey('proventos_fpg.id_provento'))
+    fk_id_deducoes = db.Column(db.Integer, db.ForeignKey('deducoes_fpg.id_deducao'))
 
     def __repr__(self):
         return '<Name %r>' % self.name
@@ -182,7 +181,8 @@ def lista_de_funcionarios():
     ).outerjoin(Departamentos, Funcionarios.fk_id_departamento == Departamentos.id_departamento).all()
 
     for funcionario, departamento in lista_func:
-        print(f"Funcionário: {funcionario.pessoa.nome}, Departamento: {departamento}, Status {funcionario.status_func}")
+        print(f"Funcionário: {funcionario.pessoa.nome}, Departamento: {
+              departamento}, Status {funcionario.status_func}")
 
     return render_template('lista.html', lista_func=lista_func, titulo="Lista de Funcionários")
 
@@ -210,8 +210,11 @@ def criando_funcionario():
     data_nascimento = request.form['data_nascimento']
     tel1 = request.form['tel1']
     tel2 = request.form['tel2']
-    endereco = request.form['endereco']
+    rua = request.form['rua']
+    bairro = request.form['bairro']
+    num_residencia = request.form['num_residencia']
     cidade = request.form['cidade']
+    cep = request.form['cep']
 
     # Requisitando as INFORMAÇÕES DO EMPREGO:
     email = request.form['email']
@@ -228,7 +231,7 @@ def criando_funcionario():
     print(f'Status convertido para Enum: {status_enum}')
 
     # Requisitando as INFORMAÇÕES DE PAGAMENTO:
-    num_banco = request.form['num_banco'] # tem que alterar para nome_banco
+    nome_banco = request.form['nome_banco']  
     num_agencia = request.form['num_agencia']
     conta_deposito = request.form['conta_deposito']
     salario_base = request.form['salario_base']
@@ -260,8 +263,11 @@ def criando_funcionario():
                           data_nascimento=data_nascimento,
                           tel1=tel1,
                           tel2=tel2,
-                          endereco=endereco,
-                          cidade=cidade)
+                          rua=rua,
+                          bairro=bairro,
+                          num_residencia=num_residencia,
+                          cidade=cidade,
+                          cep=cep)
 
     print("ADICIONAND PESSOA NA TABELA")
     # Adicionando a nova pessoa ao banco
@@ -276,8 +282,7 @@ def criando_funcionario():
         return redirect(url_for('lista_de_funcionarios'))
 
     # Buscando o departamento
-    departamento_obj = Departamentos.query.filter_by(
-        id_departamento=fk_id_departamento).first()
+    departamento_obj = Departamentos.query.filter_by(id_departamento=fk_id_departamento).first()
 
     # Pensar em como lidar caso não seja encontrado alguma departamento. (método temporário abaixo)
     if not departamento_obj:
@@ -312,7 +317,7 @@ def criando_funcionario():
         nova_folha_pagamento = Folha_pagamento(fk_id_func=novo_funcionario.id_func,
                                                salario_base=salario_base,
                                                num_agencia=num_agencia,
-                                               num_banco=num_banco, # tem que alterar para nome_banco
+                                               nome_banco=nome_banco,
                                                conta_deposito=conta_deposito,
                                                data_pagamento=data_pagamento,
                                                tipo=tipo_contratacao_enum.value)
@@ -357,16 +362,19 @@ def editar_informacoes(id_func):
 def atualizar_informacoes():
 
     # Atualiza as informações pessoais
-    atualiza_pessoa = Pessoas.query.filter_by(id_pessoa=request.form['id_pessoa']).first()
+    atualiza_pessoa = Pessoas.query.filter_by(
+        id_pessoa=request.form['id_pessoa']).first()
 
     atualiza_pessoa.nome = request.form['nome']
     atualiza_pessoa.cpf = request.form['cpf']
     atualiza_pessoa.data_nascimento = request.form['data_nascimento']
     atualiza_pessoa.tel1 = request.form['tel1']
     atualiza_pessoa.tel2 = request.form['tel2']
-    atualiza_pessoa.endereco = request.form['endereco']
+    atualiza_pessoa.rua = request.form['rua']
+    atualiza_pessoa.bairro = request.form['bairro']
+    atualiza_pessoa.num_residencia = request.form['num_residencia']
     atualiza_pessoa.cidade = request.form['cidade']
-
+    atualiza_pessoa.cep = request.form['cep']
 
     # Atualiza as informações de emprego
     atualiza_emprego = Funcionarios.query.filter_by(id_func=request.form['id_func']).first()
@@ -388,12 +396,11 @@ def atualizar_informacoes():
     if 'id_pagamento' in request.form:
         folha_pagamento = Folha_pagamento.query.filter_by(id_folha=request.form['id_pagamento']).first()
         folha_pagamento.salario_base = request.form['salario_base']
-        folha_pagamento.num_banco = request.form['num_banco'] # tem que alterar para nome_banco
+        # tem que alterar para nome_banco
+        folha_pagamento.nome_banco = request.form['nome_banco']
         folha_pagamento.num_agencia = request.form['num_agencia']
         folha_pagamento.conta_deposito = request.form['conta_deposito']
         db.session.add(folha_pagamento)
-
-
 
     # Salva as alterações no banco de dados
     db.session.add(atualiza_pessoa)
@@ -420,7 +427,7 @@ def funcionario_detalhes(id_func):
 @app.route('/deletar/<int:id_func>')
 def deletar_informacoes(id_func):
     funcionario = Funcionarios.query.get_or_404(id_func)
-        
+
     try:
         # Recupera e exclui o funcionário e suas informações associadas
         pessoa = Pessoas.query.get(funcionario.fk_id_pessoa)
@@ -435,10 +442,10 @@ def deletar_informacoes(id_func):
     except Exception as e:
         db.session.rollback()
         flash("Erro ao tentar excluir o funcionário.", "danger")
-    
+
     # Redireciona para a lista de funcionários após exclusão
     return redirect(url_for('lista_de_funcionarios'))
-    
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)

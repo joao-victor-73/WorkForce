@@ -35,13 +35,28 @@
                 </div>
                 
                 <div class="textfield">
-                    <label for="endereco">Endereço:</label>
-                    <input type="text"  name="endereco" placeholder="Endereco" value="{{ pessoa.endereco }}">
+                    <label for="rua">Rua:</label>
+                    <input type="text"  name="rua" placeholder="Rua" value="{{ pessoa.rua }}">
+                </div>
+
+                <div class="textfield">
+                    <label for="bairro">Bairro:</label>
+                    <input type="text"  name="bairro" placeholder="Bairro" value="{{ pessoa.bairro }}">
+                </div>
+
+                <div class="textfield">
+                    <label for="num_residencia">Número da Residência:</label>
+                    <input type="text"  name="num_residencia" placeholder="Número da Residência:" value="{{ pessoa.num_residencia }}">
                 </div>
 
                 <div class="textfield">
                     <label for="cidade">Cidade:</label>
                     <input type="text" name="cidade" placeholder="Cidade" value="{{ pessoa.cidade }}">
+                </div>
+
+                <div class="textfield">
+                    <label for="cep">CEP:</label>
+                    <input type="text" name="cep" placeholder="CEP" value="{{ pessoa.cep }}">
                 </div>
                 
 
@@ -90,8 +105,8 @@
 
                 {% if folha_pagamento %}
                     <div class="textfield">
-                        <label for="num_banco">Nome do Banco: </label>
-                        <input type="text" name="num_banco" value="{{ folha_pagamento.num_banco }}" required>
+                        <label for="nome_banco">Nome do Banco: </label>
+                        <input type="text" name="nome_banco" value="{{ folha_pagamento.nome_banco }}" required>
                     </div>
 
                     <div class="textfield">

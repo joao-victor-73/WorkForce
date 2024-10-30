@@ -93,14 +93,25 @@ CREATE TABLE folha_pagamento (
     conta_deposito VARCHAR(50),
     salario_base DECIMAL(10, 2) NOT NULL DEFAULT 1414.00,
     fk_id_func INT,
-	geracao_folha DATETIME DEFAULT CURRENT_TIMESTAMP,
-
-    
-    CONSTRAINT fk_folhaPagamento_funcionario 
-		FOREIGN KEY (fk_id_func) 
-        REFERENCES funcionarios (id_func) 
-        ON DELETE CASCADE 
-        ON UPDATE CASCADE
+    fk_id_proventos INT,
+    fk_id_deducoes INT,
+    geracao_folha DATETIME DEFAULT CURRENT_TIMESTAMP,
+        
+        CONSTRAINT fk_folhaPagamento_funcionario
+            FOREIGN KEY (fk_id_func) 
+            REFERENCES funcionarios (id_func) 
+            ON DELETE CASCADE 
+            ON UPDATE CASCADE,
+                             
+        CONSTRAINT fk_folhaPagamento_provento
+            FOREIGN KEY (fk_id_proventos)
+            REFERENCES proventos_fpg (id_provento)
+            ON DELETE CASCADE,
+                             
+        CONSTRAINT fk_folhaPagamento_deducao
+            FOREIGN KEY (fk_id_deducoes)
+            REFERENCES deducoes_fpg (id_deducao)
+            ON DELETE CASCADE
 );
 
 -- CRIAÇÃO DE TABELAS INTERMEDIARIAS
