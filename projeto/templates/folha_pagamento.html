@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+    <style>
+        .item-content {
+            margin-right: 10px; /* Ajuste a distância conforme necessário das listas abaixo */
+        }
+    </style>
+
+    <h1>Folha de Pagamento</h1>
+    <h5> Mês:  </h5>
+    <hr>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>Dados do Funcionário</h2>
+        </div>
+        
+        <div class="card-body">
+            <p>Nome: {{ funcionario.pessoa.nome }}</p>
+            <p>CPF: {{ funcionario.pessoa.cpf }}</p>
+            <p>Cargo: {{ funcionario.nome_cargo }}</p>
+        </div>
+        
+        <div class="card-header">
+            <h2>Informações de Pagamento</h2>
+        </div>
+
+        <div class="card-body">
+            <p>Data de Pagamento: {{ folha.data_pagamento }}</p>
+            <p>Banco: {{ folha.nome_banco }}</p>
+            <p>Agência: {{ folha.num_agencia }}</p>
+            <p>Conta: {{ folha.conta_deposito }}</p>
+            <p>Salário Base: R$ {{ folha.salario_base }}</p>
+        </div>
+        
+        <div class="card-header">
+            <h3>Proventos</h3>
+        </div>
+        <div class="container mt-4">
+            <ul class="list-group">
+                {% for provento in proventos %}
+                <li class="list-group-item d-flex align-items-center">
+                    <span class="item-content"> {{ provento.desc_provento }} </span>
+                    <span class="badge bg-success rounded-pill"> R$ {{ provento.valor_provento }} </span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <div class="card-header">
+            <h3>Deduções</h3>
+        </div>
+        <div class="container mt-4">
+            <ul class="list-group">
+                {% for deducao in deducoes %}
+                <li class="list-group-item d-flex align-items-center">
+                    <span class="item-content"> {{ deducao.desc_deducao }} </span>
+                    <span class="badge bg-danger rounded-pill"> R$ {{ deducao.valor_deducao }} </span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <div class="card-header">
+            <h3>Totais</h3>
+        </div>
+        <div class="container mt-4">
+            <ul class="list-group">
+                <li class="list-group-item d-flex align-items-center">
+                    <span class="item-content">Total Proventos </span>
+                    <span class="badge bg-secondary rounded-pill">R$ {{ proventos | sum(attribute='valor_provento') }}</span>
+                </li>
+    
+                <li class="list-group-item d-flex align-items-center">
+                    <span class="item-content"> Total Deduções </span>
+                    <span class="badge bg-secondary rounded-pill"> R$ {{ deducoes | sum(attribute='valor_deducao') }} </span>
+                </li>
+                
+                <li class="list-group-item d-flex align-items-center">
+                    <span class="item-content"> Salário Líquido </span>
+                    <span class="badge bg-success rounded-pill"> R$ {{ folha.salario_base + (proventos | sum(attribute='valor_provento')) - (deducoes | sum(attribute='valor_deducao')) }} </span>
+                </li>
+            </ul>
+        </div>
+    
+    </div>
+    
+{% endblock %}

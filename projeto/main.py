@@ -29,7 +29,6 @@ class StatusTipo(enum.Enum):
     FOLGUISTA = "FOLGUISTA"
     INTERMITENTE = "INTERMITENTE"
     MENSALISTA = "MENSALISTA"
-    PJ = "PJ"
 
 
 class Departamentos(db.Model):
@@ -122,17 +121,22 @@ class Folha_pagamento(db.Model):
 
     id_pagamento = db.Column(db.Integer, primary_key=True)
     data_pagamento = db.Column(db.String(15), nullable=False)
-    tipo = db.Column(db.Enum('HORISTA', 'FOLGUISTA', 'INTERMITENTE','MENSALISTA'), nullable=False, default='HORISTA')
+    tipo = db.Column(db.Enum('HORISTA', 'FOLGUISTA', 'INTERMITENTE',
+                     'MENSALISTA'), nullable=False, default='HORISTA')
     nome_banco = db.Column(db.String(100))
     num_agencia = db.Column(db.String(50))
     conta_deposito = db.Column(db.String(50))
-    salario_base = db.Column(db.Numeric(10, 2), nullable=False, default=1414.00)
+    salario_base = db.Column(db.Numeric(
+        10, 2), nullable=False, default=1414.00)
     geracao_folha = db.Column(db.Date, default=datetime.now(timezone.utc))
 
     # Relacionamentos
-    fk_id_func = db.Column(db.Integer, db.ForeignKey('funcionarios.id_func'), nullable=False)
-    fk_id_proventos = db.Column(db.Integer, db.ForeignKey('proventos_fpg.id_provento'))
-    fk_id_deducoes = db.Column(db.Integer, db.ForeignKey('deducoes_fpg.id_deducao'))
+    fk_id_func = db.Column(db.Integer, db.ForeignKey(
+        'funcionarios.id_func'), nullable=False)
+    fk_id_proventos = db.Column(
+        db.Integer, db.ForeignKey('proventos_fpg.id_provento'))
+    fk_id_deducoes = db.Column(
+        db.Integer, db.ForeignKey('deducoes_fpg.id_deducao'))
 
     def __repr__(self):
         return '<Name %r>' % self.name
@@ -231,7 +235,7 @@ def criando_funcionario():
     print(f'Status convertido para Enum: {status_enum}')
 
     # Requisitando as INFORMAÇÕES DE PAGAMENTO:
-    nome_banco = request.form['nome_banco']  
+    nome_banco = request.form['nome_banco']
     num_agencia = request.form['num_agencia']
     conta_deposito = request.form['conta_deposito']
     salario_base = request.form['salario_base']
@@ -282,7 +286,8 @@ def criando_funcionario():
         return redirect(url_for('lista_de_funcionarios'))
 
     # Buscando o departamento
-    departamento_obj = Departamentos.query.filter_by(id_departamento=fk_id_departamento).first()
+    departamento_obj = Departamentos.query.filter_by(
+        id_departamento=fk_id_departamento).first()
 
     # Pensar em como lidar caso não seja encontrado alguma departamento. (método temporário abaixo)
     if not departamento_obj:
@@ -353,7 +358,8 @@ def editar_informacoes(id_func):
     departamentos = Departamentos.query.all()
 
     # Verifica se o funcionário tem uma folha de pagamento associada
-    folha_pagamento = Folha_pagamento.query.filter_by(fk_id_func=id_func).first()
+    folha_pagamento = Folha_pagamento.query.filter_by(
+        fk_id_func=id_func).first()
 
     return render_template("editar.html", titulo="Editar Informações", funcionario=funcionario, pessoa=pessoa, departamentos=departamentos, folha_pagamento=folha_pagamento)
 
@@ -377,7 +383,8 @@ def atualizar_informacoes():
     atualiza_pessoa.cep = request.form['cep']
 
     # Atualiza as informações de emprego
-    atualiza_emprego = Funcionarios.query.filter_by(id_func=request.form['id_func']).first()
+    atualiza_emprego = Funcionarios.query.filter_by(
+        id_func=request.form['id_func']).first()
 
     atualiza_emprego.email = request.form['email']
     atualiza_emprego.data_contratacao = request.form['data_contratacao']
@@ -394,7 +401,8 @@ def atualizar_informacoes():
 
     # Atualizar informações salariais
     if 'id_pagamento' in request.form:
-        folha_pagamento = Folha_pagamento.query.filter_by(id_folha=request.form['id_pagamento']).first()
+        folha_pagamento = Folha_pagamento.query.filter_by(
+            id_folha=request.form['id_pagamento']).first()
         folha_pagamento.salario_base = request.form['salario_base']
         # tem que alterar para nome_banco
         folha_pagamento.nome_banco = request.form['nome_banco']
@@ -445,6 +453,23 @@ def deletar_informacoes(id_func):
 
     # Redireciona para a lista de funcionários após exclusão
     return redirect(url_for('lista_de_funcionarios'))
+
+
+# Rota para criar folha de pagamentos do funcionário
+@app.route('/gerar_folha_pagamento/<int:id_func>')
+def gerar_folha_pagamento(id_func):
+    # Buscar o funcionário 
+    funcionario = Funcionarios.query.get_or_404(id_func)
+
+    # Buscar a folha de pagamento mais recente
+    folha = Folha_pagamento.query.filter_by(fk_id_func=id_func).order_by(Folha_pagamento.data_pagamento.desc()).first()
+
+    # Buscar proventos e deduções associados à folha de pagamento
+    proventos = db.session.query(Provento).join(FolhaProventos).filter(FolhaProventos.fk_id_pagamento == folha.id_pagamento).all()
+    deducoes = db.session.query(Deducao).join(FolhaDeducoes).filter(FolhaDeducoes.fk_id_pagamento == folha.id_pagamento).all()
+
+    return render_template('folha_pagamento.html', funcionario=funcionario, folha=folha, proventos=proventos, deducoes=deducoes)
+
 
 
 if __name__ == '__main__':
