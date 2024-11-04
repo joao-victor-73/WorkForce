@@ -471,6 +471,17 @@ def gerar_folha_pagamento(id_func):
     return render_template('folha_pagamento.html', funcionario=funcionario, folha=folha, proventos=proventos, deducoes=deducoes)
 
 
+# Rota para adicionar proventos a um funcionário
+@app.route('/add_proventos')
+def add_proventos():
+    return render_template("add_proventos.html")
+
+
+# Rota para adicionar deduções a um funcionário
+@app.route('/add_deducoes')
+def add_deducoes():
+    return render_template("add_deducoes.html")
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
