@@ -1,0 +1,44 @@
+.dashboard-container {
+    display: flex;
+    justify-content: space-around; /* Distribui os cards com espaço ao redor */
+    align-items: center; /* Alinha os cards verticalmente */
+    padding: 200px; /* Espaçamento interno */
+}
+
+.dashboard-card {
+    background-color: #fff; /* Fundo branco */
+    border-radius: 10px; /* Bordas arredondadas */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra */
+    width: 250px; /* Largura dos cards */
+    height: 150px; /* Altura dos cards */
+    display: flex;
+    flex-direction: column; /* Alinha o conteúdo em coluna */
+    justify-content: center; /* Centraliza o conteúdo verticalmente */
+    align-items: center; /* Centraliza o conteúdo horizontalmente */
+    text-align: center; /* Centraliza o texto */
+    padding: 15px; /* Espaçamento interno */
+    margin: 10px; /* Espaçamento entre os cards */
+    transition: transform 0.3s; /* Animação ao passar o mouse */
+}
+
+.dashboard-card i {
+    font-size: 30px;
+    color: #191970;
+    margin-bottom: 10px;
+}
+
+.dashboard-card h3 {
+    font-size: 18px;
+    margin: 10px 0;
+    color: #333;
+}
+
+.dashboard-card p {
+    font-size: 24px;
+    color: #f97316;
+    margin: 0;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px); /* Levanta o card ao passar o mouse */
+}

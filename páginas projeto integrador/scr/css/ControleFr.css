@@ -1,0 +1,104 @@
+/* Contêiner Principal da Página de Frequência */
+.frequency-container {
+    margin-left: 260px; /* Espaçamento em relação ao sidebar */
+    padding: 20px;
+    background-color: #f4f4f4;
+    min-height: 100vh;
+}
+
+/* Título */
+.frequency-container h2 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Filtro de Busca */
+.filter-section {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.filter-section label {
+    font-weight: bold;
+}
+
+.filter-section input[type="text"],
+.filter-section input[type="date"] {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Tabela de Frequência */
+.frequency-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.frequency-table th,
+.frequency-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+.frequency-table th {
+    background-color: #333;
+    color: white;
+}
+
+.frequency-table td {
+    background-color: #fff;
+}
+
+.frequency-table .status {
+    padding: 5px 10px;
+    border-radius: 5px;
+    color: white;
+}
+
+.status.presente {
+    background-color: #4CAF50;
+}
+
+.status.ausente {
+    background-color: #FF5733;
+}
+
+/* Botões de Ação */
+.btn-presente, .btn-ausente {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-presente {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.btn-ausente {
+    background-color: #FF5733;
+    color: white;
+}
+
+/* Estatísticas de Frequência */
+.frequency-stats {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+}
+
+.frequency-stats h3 {
+    margin-top: 0;
+    color: #333;
+}
+
+.frequency-stats p {
+    margin: 5px 0;
+    font-weight: bold;
+}

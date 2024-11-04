@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="scr/css/SideBar.css">
+    <link rel="stylesheet" href="scr/css/Funcionarios.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>Funcionarios- WorkForce's</title>
+</head>
+<body>
+    <div class="container"> <!-- Menu Lateral -->
+        <header>
+            <nav id="sidebar">
+                <div id="sidebar_content">
+                    <div id="user"> <!-- Perfil no menu lateral -->
+                        <img src="Imagens/profile.avatar.jpeg" id="user_avatar" alt="Avatar">
+                        <p id="user_infos">
+                            <span class="item-description">José</span>
+                            <span class="item-description">Administrador</span>
+                        </p>
+                    </div>
+
+                    <ul id="side_item">
+                        <li class="side-item">
+                            <a href="Dashboard.html">
+                                <i class="fa-solid fa-chart-simple"></i>
+                                <span class="item-description">Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="side-item active">
+                            <a href="funcionarios.html"> 
+                                <i class="fa-solid fa-user-check"></i>
+                                <span class="item-description">Funcionários</span>
+                            </a>
+                        </li>
+                        <li class="side-item">
+                            <a href="ControleAcessos.html">
+                                <i class="fa-solid fa-shield-halved"></i>
+                                <span class="item-description">Controle de Acesso</span>
+                            </a>
+                        </li>
+                        <li class="side-item">
+                            <a href="ControleFrequencia.html">
+                                <i class="fa-solid fa-clipboard-list"></i>
+                                <span class="item-description">Controle de Frequência</span>
+                            </a>
+                        </li>
+                    </ul>
+
+                    <button id="open_btn">
+                        <i id="open_btn_icon" class="fa-solid fa-bars"></i>
+                    </button>    
+                </div>
+
+                <div id="logout">
+                    <a href="index.html" id="logout_btn">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span class="item-description">Logout</span> 
+                    </a>
+                </div>
+            </nav>
+        </header>
+    </div>
+
+<div>
+    <main>
+        <div class="form-container">
+            <h2></i><i class="fa-solid fa-user"></i> Cadastrar Funcionário</h2>
+            <form id="addEmployeeForm">
+                <fieldset>
+                    <legend>Informações Pessoais</legend>
+                    <label for="employeeFullName">Nome Completo:</label>
+                    <input type="text" id="employeeFullName" placeholder="Digite o nome completo" required>
+    
+                    <label for="employeeCPF">CPF:</label>
+                    <input type="text" id="employeeCPF" placeholder="Digite o CPF" required>
+    
+                    <label for="employeeDOB">Data de Nascimento:</label>
+                    <input type="date" id="employeeDOB" required>
+                    <br>
+                    <label for="employeeContact1">Número para Contato 1:</label>
+                    <input type="tel" id="employeeContact1" placeholder="Digite o número para contato 1" required>
+    
+                    <label for="employeeContact2">Número para Contato 2:</label>
+                    <input type="tel" id="employeeContact2" placeholder="Digite o número para contato 2">
+                    <br>
+                    <label for="employeeAddress">Endereço:</label>
+                    <input type="text" id="employeeAddress" placeholder="Digite o endereço" required>
+    
+                    <label for="employeeCity">Cidade:</label>
+                    <input type="text" id="employeeCity" placeholder="Digite a cidade" required>
+                </fieldset>
+    
+                <fieldset>
+                    <legend>Informações do Emprego</legend>
+                    <label for="employeeEmail">Email:</label>
+                    <input type="email" id="employeeEmail" placeholder="Digite o email" required>
+    
+                    <label for="employeeHireDate">Data de Contratação:</label>
+                    <input type="date" id="employeeHireDate" required>
+                    
+                    <label for="employeePosition">Cargo:</label>
+                    <input type="text" id="employeePosition" placeholder="Digite o cargo" required>
+                    <br>
+                    <label for="employeeDepartment">Departamento:</label>
+                    <input type="text" id="employeeDepartment" placeholder="Digite o departamento" required>
+    
+                    <label for="employeeStatus">Status:</label>
+                    <select id="employeeStatus" required>
+                        <option value="" disabled selected>Selecione o status</option>
+                        <option value="Ativo">Ativo</option>
+                        <option value="Inativo">Inativo</option>
+                    </select>
+                </fieldset>
+    
+                <fieldset>
+                    <legend>Informações de Salário</legend>
+                    <label for="employeeBankName">Nome do Banco:</label>
+                    <input type="text" id="employeeBankName" placeholder="Digite o nome do banco" required>
+    
+                    <label for="employeeAgencyNumber">Número da Agência:</label>
+                    <input type="text" id="employeeAgencyNumber" placeholder="Digite o número da agência" required>
+    
+                    <label for="employeeAccountNumber">Conta de Depósito:</label>
+                    <input type="text" id="employeeAccountNumber" placeholder="Digite o número da conta" required>
+                    <br>
+                    <label for="employeeBaseSalary">Salário Base:</label>
+                    <input type="number" id="employeeBaseSalary" placeholder="Digite o salário base" required>
+    
+                    <label for="employeePaymentDate">Data de Pagamento:</label>
+                    <input type="date" id="employeePaymentDate" required>
+    
+                    <label for="employeePaymentType">Tipo:</label>
+                    <select id="employeePaymentType" required>
+                        <option value="" disabled selected>Selecione o tipo</option>
+                        <option value="Mensal">Mensal</option>
+                        <option value="Quinzenal">Quinzenal</option>
+                    </select>
+                </fieldset>
+    
+                <button type="submit">Cadastrar Funcionário</button>
+            </form>
+        </div>
+    
+        <div class="update-container">
+            <h2>Atualizar Funcionário</h2>
+            <form id="updateEmployeeForm">
+                <label for="updateEmployeeId">ID do Funcionário:</label>
+                <input type="number" id="updateEmployeeId" placeholder="Digite o ID do funcionário" required>
+    
+                <label for="updateEmployeeName">Nome:</label>
+                <input type="text" id="updateEmployeeName" placeholder="Digite o novo nome" required>
+    
+                <label for="updateEmployeeRole">Cargo:</label>
+                <input type="text" id="updateEmployeeRole" placeholder="Digite o novo cargo" required>
+    
+                <button type="submit">Atualizar</button>
+            </form>
+        </div>
+    
+        <div class="employee-list">
+            <h2>Lista de Funcionários</h2>
+            <input type="text" id="searchInput" placeholder="Pesquisar funcionário...">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Cargo</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="employeeTableBody">
+                    <!-- Os dados dos funcionários serão inseridos aqui -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>    
+
+    <script src="scr/js/Dashboard.js"></script> 
+</body>
+</html>

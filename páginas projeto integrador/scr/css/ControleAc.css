@@ -1,0 +1,85 @@
+/* Estilo do Contêiner do Controle de Acesso */
+.access-control-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+/* Estilo para a seção de gerenciar permissões */
+.user-permissions-container {
+    margin-bottom: 20px;
+}
+
+.user-permissions-container form {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-permissions-container label {
+    margin-bottom: 5px;
+}
+
+.user-permissions-container select {
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #f97316;
+    border-radius: 4px;
+}
+
+.permission-checkboxes {
+    margin-bottom: 15px;
+}
+
+.permission-checkboxes label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.user-permissions-container button {
+    padding: 10px;
+    background-color: #f97316   ;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.user-permissions-container button:hover {
+    background-color: #191970; /* Cor ao passar o mouse */
+}
+
+/* Estilo para a lista de usuários */
+.user-list-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table th, table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+table th {
+    background-color: #f8f9fa;
+}
+
+table tbody tr:hover {
+    background-color: #f1f1f1; /* Cor ao passar o mouse sobre as linhas */
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .access-control-container {
+        padding: 15px;
+    }
+}
