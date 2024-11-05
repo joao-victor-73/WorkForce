@@ -84,6 +84,11 @@
             </ul>
         </div>
     
+        <div class="card-footer">
+            <a href="{{ url_for('add_deducoes', id_pagamento=folha.id_pagamento) }}" class="btn btn-secondary"> Adicionar Dedução </a>
+            <a href="{{ url_for('add_proventos', id_pagamento=folha.id_pagamento) }}" class="btn btn-secondary"> Adicionar Provento </a>
+        </div>
+
     </div>
     
 {% endblock %}

@@ -2,4 +2,15 @@
 
 {% block conteudo %}
 
+    <h2>Adicionar Dedução</h2>
+    <form method="POST">
+        <label for="descricao">Descrição da Dedução:</label>
+        <input type="text" name="descricao" required>
+        <br>
+        <label for="valor">Valor da Dedução:</label>
+        <input type="number" name="valor" step="0.01" required>
+        <br>
+        <button type="submit">Adicionar</button>
+    </form>
+
 {% endblock %}

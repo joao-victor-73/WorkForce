@@ -458,29 +458,71 @@ def deletar_informacoes(id_func):
 # Rota para criar folha de pagamentos do funcionário
 @app.route('/gerar_folha_pagamento/<int:id_func>')
 def gerar_folha_pagamento(id_func):
-    # Buscar o funcionário 
+    # Buscar o funcionário
     funcionario = Funcionarios.query.get_or_404(id_func)
 
     # Buscar a folha de pagamento mais recente
-    folha = Folha_pagamento.query.filter_by(fk_id_func=id_func).order_by(Folha_pagamento.data_pagamento.desc()).first()
+    folha = Folha_pagamento.query.filter_by(fk_id_func=id_func).order_by(
+        Folha_pagamento.data_pagamento.desc()).first()
 
     # Buscar proventos e deduções associados à folha de pagamento
-    proventos = db.session.query(Provento).join(FolhaProventos).filter(FolhaProventos.fk_id_pagamento == folha.id_pagamento).all()
-    deducoes = db.session.query(Deducao).join(FolhaDeducoes).filter(FolhaDeducoes.fk_id_pagamento == folha.id_pagamento).all()
+    proventos = db.session.query(Provento).join(FolhaProventos).filter(
+        FolhaProventos.fk_id_pagamento == folha.id_pagamento).all()
+    deducoes = db.session.query(Deducao).join(FolhaDeducoes).filter(
+        FolhaDeducoes.fk_id_pagamento == folha.id_pagamento).all()
 
     return render_template('folha_pagamento.html', funcionario=funcionario, folha=folha, proventos=proventos, deducoes=deducoes)
 
 
 # Rota para adicionar proventos a um funcionário
-@app.route('/add_proventos')
-def add_proventos():
-    return render_template("add_proventos.html")
+@app.route('/add_proventos/<int:id_pagamento>', methods=['POST', 'GET'])
+def add_proventos(id_pagamento):
+    folha_pagamento = Folha_pagamento.query.get_or_404(id_pagamento)
+
+    if request.method == 'POST':
+        descricao = request.form['descricao']
+        valor = request.form['valor']
+
+        # Cria um novo provento
+        novo_provento = Provento(desc_provento=descricao, valor_provento=valor)
+        db.session.add(novo_provento)
+        db.session.commit()
+
+        # Associa o provento à folha de pagamento
+        folha_provento = FolhaProventos(
+            fk_id_pagamento=id_pagamento, fk_id_provento=novo_provento.id_provento)
+        db.session.add(folha_provento)
+        db.session.commit()
+
+        flash('Provento adicionado com sucesso!')
+        return redirect(url_for('gerar_folha_pagamento', id_func=folha_pagamento.fk_id_func))
+
+    return render_template('add_proventos.html', folha_pagamento=folha_pagamento, titulo="Adicionar Provento")
 
 
 # Rota para adicionar deduções a um funcionário
-@app.route('/add_deducoes')
-def add_deducoes():
-    return render_template("add_deducoes.html")
+@app.route('/add_deducoes/<int:id_pagamento>', methods=['POST', 'GET'])
+def add_deducoes(id_pagamento):
+    folha_pagamento = Folha_pagamento.query.get_or_404(id_pagamento)
+    if request.method == 'POST':
+        descricao = request.form['descricao']
+        valor = request.form['valor']
+
+        # Cria uma nova dedução
+        nova_deducao = Deducao(desc_deducao=descricao, valor_deducao=valor)
+        db.session.add(nova_deducao)
+        db.session.commit()
+
+        # Associa a dedução à folha de pagamento
+        folha_deducao = FolhaDeducoes(
+            fk_id_pagamento=id_pagamento, fk_id_deducao=nova_deducao.id_deducao)
+        db.session.add(folha_deducao)
+        db.session.commit()
+
+        flash('Dedução adicionada com sucesso!')
+        return redirect(url_for('gerar_folha_pagamento', id_func=folha_pagamento.fk_id_func))
+
+    return render_template('add_deducoes.html', folha_pagamento=folha_pagamento, titulo="Adicionar Dedução")
 
 
 if __name__ == '__main__':
