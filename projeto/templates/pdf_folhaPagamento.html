@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Folha de Pagamento</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            font-size: 12px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #000;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        .header {
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>Folha de Pagamento</h2>
+        <p><strong>Funcionário:</strong> {{ funcionario.pessoa.nome }} </p> 
+        <p><strong>Mês:</strong> {{ folha.data_pagamento }}</p>
+    </div>
+    
+    <table>
+        <!-- PROVENTOS -->
+         <h3> PROVENTOS </h3>
+        <thead>
+            <tr>
+                <th> Cód </th>
+                <th> Desc </th>
+                <th> R$ </th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for provento in proventos %}
+            
+            <tr>
+                <td>{{ provento.id_provento }}</td>
+                <td>{{ provento.desc_provento }}</td>
+                <td>R$ {{ provento.valor_provento | replace(".", ",") }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <br>
+
+    <table>
+        <!-- DEDUÇÕES -->
+        <h3> DEDUÇÕES </h3>
+        <thead>
+            <tr>
+                <th> Cód </th>
+                <th> Desc </th>
+                <th> R$ </th>
+            </tr>
+         </thead>
+         <tbody>
+            
+            {% for deducao in deducoes %}
+            <tr>
+                <td>{{ deducao.id_deducao }}</td>
+                <td>{{ deducao.desc_deducao }}</td>
+                <td>R$ {{ deducao.valor_deducao | replace(".", ",") }}</td>
+            </tr>
+            {% endfor %}
+
+         </tbody>
+    </table>
+
+
+    <!-- Seção de Totais -->
+    <div class="totals-container">
+        <div>
+            <strong>Total Proventos:</strong> R$ {{ total_proventos | round(2) | replace(".", ",") }}<br>
+            <strong>Total Deduções:</strong> R$ {{ total_deducoes | round(2) | replace(".", ",") }}<br>
+        </div>
+        <div>
+            <strong>Salário Base:</strong> R$ {{ folha.salario_base | round(2) | replace(".", ",") }}
+            <strong>Salário Líquido:</strong> R$ {{ salario_liquido | round(2) | replace(".", ",") }}
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>Documento gerado pelo Sistema de Folha de Pagamento</p>
+    </div>
+</body>
+</html>

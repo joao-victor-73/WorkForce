@@ -1,7 +1,10 @@
-from flask import Flask, render_template, request, redirect, session, flash, url_for
+from flask import Flask, render_template, request, redirect, session, flash, url_for, send_file
 from flask_sqlalchemy import SQLAlchemy  # pip install flask-SQLAlchemy
 import enum
 from datetime import datetime, timezone
+# pip install weasyprint (biblioteca para importar p/ PDF)
+from weasyprint import HTML
+import io
 
 
 app = Flask(__name__)
@@ -588,6 +591,38 @@ def add_deducoes(id_pagamento):
         return redirect(url_for('gerar_folha_pagamento', id_func=folha_pagamento.fk_id_func))
 
     return render_template('add_deducoes.html', folha_pagamento=folha_pagamento, deducoes_existentes=deducoes_existentes, titulo="Adicionar Dedução")
+
+
+# Rota para gerar o PDF da folha de pagamento
+@app.route('/imprimir_folha_pagamento/<int:id_pagamento>')
+def imprimir_folha_pagamento(id_pagamento):
+    # Recupera a folha de pagamento, proventos e deduções
+    folha = Folha_pagamento.query.get_or_404(id_pagamento)
+    proventos = db.session.query(Provento).join(FolhaProventos).filter(FolhaProventos.fk_id_pagamento == folha.id_pagamento).all()
+    deducoes = db.session.query(Deducao).join(FolhaDeducoes).filter(FolhaDeducoes.fk_id_pagamento == folha.id_pagamento).all()
+    
+    # Vai servir básicamente só para pegar o nome do funcionário
+    funcionario = Funcionarios.query.get_or_404(folha.fk_id_func)
+    nome_funcionario = funcionario.pessoa.nome
+
+    # Calcular totais no backend
+    total_proventos = sum(provento.valor_provento for provento in proventos)
+    total_deducoes = sum(deducao.valor_deducao for deducao in deducoes)
+    salario_base = folha.salario_base
+    salario_liquido = salario_base + total_proventos - total_deducoes
+
+    # Gerar HTML para o PDF (pensar em uma maneira melhor de passar tudo isso para o html)
+    html_content = render_template('pdf_folhaPagamento.html', folha=folha, proventos=proventos, deducoes=deducoes, total_proventos=total_proventos, total_deducoes=total_deducoes, salario_liquido=salario_liquido, funcionario=funcionario)
+    
+    # Criar o PDF a partir do HTML
+    pdf = HTML(string=html_content).write_pdf()
+    
+    # Retorna o PDF gerado como um arquivo para download
+    return send_file(io.BytesIO(pdf), as_attachment=True, download_name=f"{funcionario.pessoa.nome}_folha_pagamento.pdf", mimetype='application/pdf')
+    
+    # as_attachment=True indica que o arquivo será enviado como um anexo (em vez de ser exibido diretamente no navegador)
+    # o arquivo será enviado automáticamente ao usuário como download, assim não salvando no servidor.
+
 
 
 if __name__ == '__main__':
