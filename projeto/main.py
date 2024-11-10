@@ -504,50 +504,90 @@ def gerar_folha_pagamento(id_func):
 def add_proventos(id_pagamento):
     folha_pagamento = Folha_pagamento.query.get_or_404(id_pagamento)
 
+    # Recupera os proventos existentes
+    proventos_existentes = Provento.query.all()
+
     if request.method == 'POST':
-        descricao = request.form['descricao']
-        valor = request.form['valor']
+        descricao = request.form['desc_provento']
+        valor = request.form['valor_provento']
 
-        # Cria um novo provento
-        novo_provento = Provento(desc_provento=descricao, valor_provento=valor)
-        db.session.add(novo_provento)
-        db.session.commit()
+        # Caso o usuário tenha escolhido um provento existente
+        provento_selecionado = request.form.get('provento')
 
-        # Associa o provento à folha de pagamento
-        folha_provento = FolhaProventos(
-            fk_id_pagamento=id_pagamento, fk_id_provento=novo_provento.id_provento)
-        db.session.add(folha_provento)
-        db.session.commit()
+        if provento_selecionado:
+            # Se o usuário selecionou um provento existente
+            provento = Provento.query.get(provento_selecionado)
 
-        flash('Provento adicionado com sucesso!')
+            # Adiciona esse provento à folha de pagamento
+            folha_provento = FolhaProventos(
+                fk_id_pagamento=id_pagamento, fk_id_provento=provento.id_provento)
+            db.session.add(folha_provento)
+            db.session.commit()
+            flash('Provento associado com sucesso!')
+
+        else:
+            # Se o usuário quer adicionar um novo provento
+            novo_provento = Provento(
+                desc_provento=descricao, valor_provento=valor)
+            db.session.add(novo_provento)
+            db.session.commit()
+
+            # Associa o novo provento à folha de pagamento
+            folha_provento = FolhaProventos(
+                fk_id_pagamento=id_pagamento, fk_id_provento=novo_provento.id_provento)
+            db.session.add(folha_provento)
+            db.session.commit()
+
+            flash('Novo Provento adicionado com sucesso!')
+
         return redirect(url_for('gerar_folha_pagamento', id_func=folha_pagamento.fk_id_func))
 
-    return render_template('add_proventos.html', folha_pagamento=folha_pagamento, titulo="Adicionar Provento")
+    return render_template('add_proventos.html', folha_pagamento=folha_pagamento, proventos_existentes=proventos_existentes, titulo="Adicionar Provento")
 
 
 # Rota para adicionar deduções a um funcionário
 @app.route('/add_deducoes/<int:id_pagamento>', methods=['POST', 'GET'])
 def add_deducoes(id_pagamento):
     folha_pagamento = Folha_pagamento.query.get_or_404(id_pagamento)
+
+    # Recupera as deduções existentes
+    deducoes_existentes = Deducao.query.all()
+
     if request.method == 'POST':
-        descricao = request.form['descricao']
-        valor = request.form['valor']
+        descricao = request.form['desc_deducao']
+        valor = request.form['valor_deducao']
 
-        # Cria uma nova dedução
-        nova_deducao = Deducao(desc_deducao=descricao, valor_deducao=valor)
-        db.session.add(nova_deducao)
-        db.session.commit()
+        # Caso o usuário tenha escolhido uma dedução existente
+        deducao_selecionado = request.form.get('deducao')
 
-        # Associa a dedução à folha de pagamento
-        folha_deducao = FolhaDeducoes(
-            fk_id_pagamento=id_pagamento, fk_id_deducao=nova_deducao.id_deducao)
-        db.session.add(folha_deducao)
-        db.session.commit()
+        if deducao_selecionado:
+            # Se o usuário selecionou uma dedução existente
+            deducao = Deducao.query.get(deducao_selecionado)
 
-        flash('Dedução adicionada com sucesso!')
+            # Adicionar essa dedução a folha de pagamento
+            folha_deducao = FolhaDeducoes(fk_id_pagamento=id_pagamento,
+                                          fk_id_deducao=deducao.id_deducao)
+            db.session.add(folha_deducao)
+            db.session.commit()
+            flash('Dedução associada com sucesso!')
+
+        else:
+            # Se o usuário quer adicionar um novo provento
+            nova_deducao = Deducao(desc_deducao=descricao, valor_deducao=valor)
+            db.session.add(nova_deducao)
+            db.session.commit()
+
+            # Associa a dedução à folha de pagamento
+            folha_deducao = FolhaDeducoes(fk_id_pagamento=id_pagamento,
+                                          fk_id_deducao=nova_deducao.id_deducao)
+            db.session.add(folha_deducao)
+            db.session.commit()
+
+            flash('Dedução adicionada com sucesso!')
+
         return redirect(url_for('gerar_folha_pagamento', id_func=folha_pagamento.fk_id_func))
 
-    return render_template('add_deducoes.html', folha_pagamento=folha_pagamento, titulo="Adicionar Dedução")
+    return render_template('add_deducoes.html', folha_pagamento=folha_pagamento, deducoes_existentes=deducoes_existentes, titulo="Adicionar Dedução")
 
 
 if __name__ == '__main__':
