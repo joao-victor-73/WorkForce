@@ -77,7 +77,8 @@ class Funcionarios(db.Model):
     __tablename__ = 'funcionarios'
 
     id_func = db.Column(db.Integer, primary_key=True)
-    fk_id_pessoa = db.Column(db.Integer, db.ForeignKey('pessoas.id_pessoa'), nullable=False)
+    fk_id_pessoa = db.Column(db.Integer, db.ForeignKey(
+        'pessoas.id_pessoa'), nullable=False)
     email = db.Column(db.String(100))
     data_contratacao = db.Column(
         db.Date, nullable=False, default=datetime.now(timezone.utc))
@@ -184,7 +185,8 @@ def lista_de_funcionarios():
     ).outerjoin(Departamentos, Funcionarios.fk_id_departamento == Departamentos.id_departamento).all()
 
     for funcionario, departamento in lista_func:
-        print(f"Funcionário: {funcionario.pessoa.nome}, Departamento: {departamento}, Status {funcionario.status_func}")
+        print(f"Funcionário: {funcionario.pessoa.nome}, Departamento: {
+              departamento}, Status {funcionario.status_func}")
 
     return render_template('lista.html', lista_func=lista_func, titulo="Lista de Funcionários")
 
@@ -334,6 +336,31 @@ def criando_funcionario():
             print("Erro ao adicionar uma nova pessoa:", e)
             flash('Erro ao cadastrar uma nova pessoa.')
             return redirect(url_for('lista_de_funcionarios'))
+
+    if nova_folha_pagamento.id_pagamento:
+        # Recupera a dedução INSS (se ela já existir)
+        inss = Deducao.query.filter_by(desc_deducao='INSS').first()
+        if not inss:
+            # Caso a dedução INSS não exista, cria ela
+            inss = Deducao(desc_deducao='INSS')
+
+        try:
+            db.session.add(inss)
+            db.session.commit()
+
+        except Exception as e:
+            db.session.rollback()
+            print("Erro ao adicionar uma nova pessoa:", e)
+            flash('Erro ao cadastrar uma nova pessoa.')
+            return redirect(url_for('lista_de_funcionarios'))
+
+    # Adiciona a dedução INSS na folha de pagamento
+    salario_base_float = float(salario_base)
+    folha_deducao = FolhaDeducoes(fk_id_pagamento=nova_folha_pagamento.id_pagamento,
+                                  fk_id_deducao=inss.id_deducao,
+                                  valor_deducao=salario_base_float * 0.08)  # Exemplo de 8% para INSS
+    db.session.add(folha_deducao)
+    db.session.commit()
 
     flash('Funcionário cadastrado com sucesso!')
     print("REDIRECIONANDO PARA A LISTA DE FUNCIONÁRIOS")
