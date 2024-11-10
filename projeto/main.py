@@ -605,7 +605,7 @@ def imprimir_folha_pagamento(id_pagamento):
     funcionario = Funcionarios.query.get_or_404(folha.fk_id_func)
     nome_funcionario = funcionario.pessoa.nome
 
-    # Calcular totais no backend
+    # Calcular totais
     total_proventos = sum(provento.valor_provento for provento in proventos)
     total_deducoes = sum(deducao.valor_deducao for deducao in deducoes)
     salario_base = folha.salario_base
