@@ -36,6 +36,7 @@
         
         <div class="card-header">
             <h3>Proventos</h3>
+            <a href="{{ url_for('add_proventos', id_pagamento=folha.id_pagamento) }}" class="btn btn-secondary"> Adicionar Provento </a>
         </div>
         <div class="container mt-4">
             <ul class="list-group">
@@ -50,6 +51,7 @@
         
         <div class="card-header">
             <h3>Deduções</h3>
+            <a href="{{ url_for('add_deducoes', id_pagamento=folha.id_pagamento) }}" class="btn btn-secondary"> Adicionar Dedução </a>
         </div>
         <div class="container mt-4">
             <ul class="list-group">
@@ -85,8 +87,7 @@
         </div>
     
         <div class="card-footer">
-            <a href="{{ url_for('add_deducoes', id_pagamento=folha.id_pagamento) }}" class="btn btn-secondary"> Adicionar Dedução </a>
-            <a href="{{ url_for('add_proventos', id_pagamento=folha.id_pagamento) }}" class="btn btn-secondary"> Adicionar Provento </a>
+            <a href="{{ url_for('funcionario_detalhes', id_func=funcionario.id_func) }}" class="btn btn-secondary">Voltar</a>
         </div>
 
     </div>

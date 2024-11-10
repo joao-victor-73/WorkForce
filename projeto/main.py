@@ -77,8 +77,7 @@ class Funcionarios(db.Model):
     __tablename__ = 'funcionarios'
 
     id_func = db.Column(db.Integer, primary_key=True)
-    fk_id_pessoa = db.Column(db.Integer, db.ForeignKey(
-        'pessoas.id_pessoa'), nullable=False)
+    fk_id_pessoa = db.Column(db.Integer, db.ForeignKey('pessoas.id_pessoa'), nullable=False)
     email = db.Column(db.String(100))
     data_contratacao = db.Column(
         db.Date, nullable=False, default=datetime.now(timezone.utc))
@@ -185,8 +184,7 @@ def lista_de_funcionarios():
     ).outerjoin(Departamentos, Funcionarios.fk_id_departamento == Departamentos.id_departamento).all()
 
     for funcionario, departamento in lista_func:
-        print(f"Funcionário: {funcionario.pessoa.nome}, Departamento: {
-              departamento}, Status {funcionario.status_func}")
+        print(f"Funcionário: {funcionario.pessoa.nome}, Departamento: {departamento}, Status {funcionario.status_func}")
 
     return render_template('lista.html', lista_func=lista_func, titulo="Lista de Funcionários")
 
