@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, flash, url_for, send_file
+from flask import Flask, render_template, request, redirect, session, flash, url_for, send_file, make_response
 from flask_sqlalchemy import SQLAlchemy  # pip install flask-SQLAlchemy
 import enum
 from datetime import datetime, timezone
@@ -598,9 +598,11 @@ def add_deducoes(id_pagamento):
 def imprimir_folha_pagamento(id_pagamento):
     # Recupera a folha de pagamento, proventos e deduções
     folha = Folha_pagamento.query.get_or_404(id_pagamento)
-    proventos = db.session.query(Provento).join(FolhaProventos).filter(FolhaProventos.fk_id_pagamento == folha.id_pagamento).all()
-    deducoes = db.session.query(Deducao).join(FolhaDeducoes).filter(FolhaDeducoes.fk_id_pagamento == folha.id_pagamento).all()
-    
+    proventos = db.session.query(Provento).join(FolhaProventos).filter(
+        FolhaProventos.fk_id_pagamento == folha.id_pagamento).all()
+    deducoes = db.session.query(Deducao).join(FolhaDeducoes).filter(
+        FolhaDeducoes.fk_id_pagamento == folha.id_pagamento).all()
+
     # Vai servir básicamente só para pegar o nome do funcionário
     funcionario = Funcionarios.query.get_or_404(folha.fk_id_func)
     nome_funcionario = funcionario.pessoa.nome
@@ -612,17 +614,36 @@ def imprimir_folha_pagamento(id_pagamento):
     salario_liquido = salario_base + total_proventos - total_deducoes
 
     # Gerar HTML para o PDF (pensar em uma maneira melhor de passar tudo isso para o html)
-    html_content = render_template('pdf_folhaPagamento.html', folha=folha, proventos=proventos, deducoes=deducoes, total_proventos=total_proventos, total_deducoes=total_deducoes, salario_liquido=salario_liquido, funcionario=funcionario)
-    
+    html_content = render_template('pdf_folhaPagamento.html', folha=folha, proventos=proventos, deducoes=deducoes,
+                                   total_proventos=total_proventos, total_deducoes=total_deducoes, salario_liquido=salario_liquido, funcionario=funcionario)
+
     # Criar o PDF a partir do HTML
     pdf = HTML(string=html_content).write_pdf()
-    
+
     # Retorna o PDF gerado como um arquivo para download
     return send_file(io.BytesIO(pdf), as_attachment=True, download_name=f"{funcionario.pessoa.nome}_folha_pagamento.pdf", mimetype='application/pdf')
-    
+
     # as_attachment=True indica que o arquivo será enviado como um anexo (em vez de ser exibido diretamente no navegador)
     # o arquivo será enviado automáticamente ao usuário como download, assim não salvando no servidor.
 
+
+# Rota para gerar uma lista de todos os funcionários em PDF
+@app.route('/gerar_listaFuncionarios_pdf')
+def gerar_listaFuncionarios_pdf():
+    # Buscar todos os funcionários do banco de dados
+    lista_func = db.session.query(Funcionarios, Departamentos.nome_departamento).outerjoin(Departamentos, Funcionarios.fk_id_departamento == Departamentos.id_departamento).all()
+
+    # Renderizar o template HTML com a lista de funcionários
+    rendered = render_template('pdf_listaFuncionarios.html', lista_func=lista_func)
+
+    # Converter o HTML para PDF usando o WeasyPrint
+    pdf = HTML(string=rendered).write_pdf()
+
+    # Criar a resposta HTTP com o PDF gerado
+    response = make_response(pdf)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'inline; filename=lista_funcionarios.pdf'
+    return response
 
 
 if __name__ == '__main__':
