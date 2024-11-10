@@ -2,74 +2,64 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WorkForce</title>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/Sidebar.css') }}">
 </head>
 <body>
-    
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-body-tertiary">
-        <!-- Container wrapper -->
-        <div class="container">
-        <!-- Navbar brand -->
-        <a class="navbar-brand me-2" href="https://mdbgo.com/">
-            <img
-            src="https://mdbcdn.b-cdn.net/img/logo/mdb-transaprent-noshadows.webp"
-            height="16"
-            alt="MDB Logo"
-            loading="lazy"
-            style="margin-top: -1px;"
-            />
-        </a>
-    
-        <!-- Toggle button -->
-        <button
-            data-mdb-collapse-init
-            class="navbar-toggler"
-            type="button"
-            data-mdb-target="#navbarButtonsExample"
-            aria-controls="navbarButtonsExample"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-        >
-            <i class="fas fa-bars"></i>
-        </button>
-    
-        <!-- Collapsible wrapper -->
-        <div class="collapse navbar-collapse" id="navbarButtonsExample">
-            <!-- Left links -->
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('index') }}">Inicio</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('lista_de_funcionarios') }}">Lista</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('novo_funcionario') }}">Cadastrar</a>
-                </li>
-            </ul>
-            <!-- Left links -->
-    
-            <div class="d-flex align-items-center">
-                <button data-mdb-ripple-init type="button" class="btn btn-primary me-3">
-                    Login
-                </button>
-            </div>
-        </div>
-        <!-- Collapsible wrapper -->
-        </div>
-        <!-- Container wrapper -->
-    </nav>
-    <!-- Navbar -->
+    <div class="container">
+        <header>
+            <nav id="sidebar"> <!-- Menu Lateral -->
+                <div id="sidebar_content">
+                    <div id="user"> <!-- Perfil no menu lateral -->
+                        <img src="{{ url_for('static', filename='image/profile_avatar_2.png') }}" id="user_avatar" alt="Avatar">
+                        <p id="user_infos">
+                            <!-- Mudar essas informações depois para as informações do usuário que fizer login -->
+                            <span class="item-description">José</span>
+                            <span class="item-description">Administrador</span>
+                        </p>
+                    </div>
 
-    <div class="page-header">
-        <h1> {{ titulo }} </h1>
+                    <ul id="side_item">
+                        <li class="side-item">
+                            <a href="{{ url_for('index') }}">
+                                <i class="fa-solid fa-chart-simple"></i>
+                                <span class="item-description">Dashboard</span>
+                            </a>
+                        </li>
+
+                        <!-- Links da navbar que agora vão para o sidebar -->
+                        <li class="side-item">
+                            <a href="{{ url_for('lista_de_funcionarios') }}">
+                                <i class="fa-solid fa-list"></i>
+                                <span class="item-description">Lista</span>
+                            </a>
+                        </li>
+                        <li class="side-item">
+                            <a href="{{ url_for('novo_funcionario') }}">
+                                <i class="fa-solid fa-user-plus"></i>
+                                <span class="item-description">Cadastrar</span>
+                            </a>
+                        </li>
+                    </ul>
+
+                    <button id="open_btn">
+                        <i id="open_btn_icon" class="fa-solid fa-bars"></i>
+                    </button>
+                </div>
+
+                <div id="logout">
+                    <a href="index.html" id="logout_btn">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span class="item-description">Logout</span> 
+                    </a>
+                </div>
+            </nav>
+        </header>
     </div>
 
-    <hr>
     
     <div class="container">
         {% block conteudo %}
@@ -77,5 +67,7 @@
         
         {% endblock %}   
     </div>
+
+    <script src="{{ url_for('static', filename='js/Dashboard.js') }}"></script>
 </body>
 </html>
