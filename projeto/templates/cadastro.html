@@ -1,64 +1,79 @@
 {% extends 'base.html' %}
 
 {% block conteudo %}
-    <div>
-        <h2>Informações Pessoais</h2>
-        <div>
-            <form action="{{url_for('criando_funcionario')}}" method='POST'>
-                <div class="textfield">
-                    <label for="nomeCompleto">Nome Completo:</label>
-                    <input type="text" name="nome" placeholder="Nome Completo" required>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/Cadastro.css') }}">
+
+<div>
+    <h1 class="titulo-cadastro">Cadastro de Funcionário</h1>
+</div>
+
+<div class="form-container">
+    <form action="{{ url_for('criando_funcionario') }}" method="POST">
+        <div class="grid-form">
+            <!-- Informações Pessoais -->
+            <div class="form-section form-pessoais">
+                <h2>Informações Pessoais</h2>
+                <div class="textfield-group">
+                    <div class="textfield">
+                        <label for="nomeCompleto">Nome Completo:</label>
+                        <input type="text" name="nome" placeholder="Nome Completo" required>
+                    </div>
+
+                    <div class="textfield">
+                        <label for="cpf">CPF:</label>
+                        <input type="text" name="cpf" placeholder="CPF" required>
+                    </div>
                 </div>
 
-                <div class="textfield">
-                    <label for="cpf">CPF:</label>
-                    <input type="text" name="cpf" placeholder="CPF:" required>
+                <div class="textfield-group">
+                    <div class="textfield">
+                        <label for="tel1">Número para contato 1:</label>
+                        <input type="text" name="tel1" placeholder="Número para contato 1">
+                    </div>
+
+                    <div class="textfield">
+                        <label for="tel2">Número para contato 2:</label>
+                        <input type="text" name="tel2" placeholder="Número para contato 2">
+                    </div>
                 </div>
 
                 <div class="textfield">
                     <label for="dataNascimento">Data de Nascimento:</label>
                     <input type="date" name="data_nascimento">
                 </div>
-                
-                <div class="textfield">
-                    <label for="tel1">Número para contato 1:</label>
-                    <input type="text"  name="tel1" placeholder="Número para contato 1">
+
+                <div class="textfield-group">
+                    <div class="textfield">
+                        <label for="rua">Rua:</label>
+                        <input type="text" name="rua" placeholder="Rua">
+                    </div>
+
+                    <div class="textfield">
+                        <label for="bairro">Bairro:</label>
+                        <input type="text" name="bairro" placeholder="Bairro">
+                    </div>
                 </div>
 
-                <div class="textfield">
-                    <label for="tel2">Número para contato 2:</label>
-                    <input type="text"  name="tel2" placeholder="Número para contato 2">
-                </div>
-                
-                <div class="textfield">
-                    <label for="rua">Rua:</label>
-                    <input type="text"  name="rua" placeholder="Rua">
-                </div>
+                <div class="textfield-group">
+                    <div class="textfield">
+                        <label for="num_residencia">Número da Residência:</label>
+                        <input type="text" name="num_residencia" placeholder="Número da Residência">
+                    </div>
 
-                <div class="textfield">
-                    <label for="bairro">Bairro:</label>
-                    <input type="text"  name="bairro" placeholder="Bairro">
-                </div>
-
-                <div class="textfield">
-                    <label for="num_residencia">Número da Residência:</label>
-                    <input type="text"  name="num_residencia" placeholder="Número da Residência:">
-                </div>
-
-                <div class="textfield">
-                    <label for="cidade">Cidade:</label>
-                    <input type="text" name="cidade" placeholder="Cidade">
+                    <div class="textfield">
+                        <label for="cidade">Cidade:</label>
+                        <input type="text" name="cidade" placeholder="Cidade">
+                    </div>
                 </div>
 
                 <div class="textfield">
                     <label for="cep">CEP:</label>
                     <input type="text" name="cep" placeholder="CEP">
                 </div>
-                
+            </div>
 
-                <br> 
-
-
+            <!-- Informações do Emprego -->
+            <div class="form-section form-emprego">
                 <h2>Informações do Emprego</h2>
                 <div class="textfield">
                     <label for="email">E-mail:</label>
@@ -69,23 +84,22 @@
                     <label for="data_contratacao">Data de Contratação:</label>
                     <input type="date" name="data_contratacao" required>
                 </div>
-    
-                
+
                 <div class="textfield">
                     <label for="cargo">Cargo:</label>
                     <input type="text" name="cargo" placeholder="Cargo" required>
                 </div>
 
-                <div>
+                <div class="textfield">
                     <label for="departamento">Departamento:</label>
-                    <select name="departamento" id="departamento" required>
+                    <select name="departamento" required>
                         <option value="">Selecione um departamento</option>
                         {% for departamento in departamentos %}
                             <option value="{{ departamento.id_departamento }}">{{ departamento.nome_departamento }}</option>
                         {% endfor %}
                     </select>
-                </div>               
-                
+                </div>
+
                 <div class="textfield">
                     <label for="status">Status:</label>
                     <select name="status" required>
@@ -95,23 +109,23 @@
                         <option value="ATESTADO">Atestado</option>
                     </select>
                 </div>
+            </div>
 
-                <br>
-
+            <!-- Informações Salariais -->
+            <div class="form-section form-salario">
                 <h2>Informações Salariais</h2>
-
                 <div class="textfield">
-                    <label for="nome_banco">Nome do Banco: </label>
+                    <label for="nome_banco">Nome do Banco:</label>
                     <input type="text" name="nome_banco" required>
                 </div>
 
                 <div class="textfield">
-                    <label for="num_agencia">Número da agência: </label>
+                    <label for="num_agencia">Número da agência:</label>
                     <input type="text" name="num_agencia" required>
                 </div>
 
                 <div class="textfield">
-                    <label for="conta_deposito">Conta de deposito: </label>
+                    <label for="conta_deposito">Conta de depósito:</label>
                     <input type="text" name="conta_deposito" required>
                 </div>
 
@@ -135,24 +149,25 @@
                         <option value="PJ">PJ</option>
                     </select>
                 </div>
-
-
-
-
-                <button type="submit">Cadastrar Funcionário</button>
-            </form>
-            
-            <script>
-                document.getElementById('salario_base').addEventListener('input', function (event) {
-                    var valor = event.target.value;
-                    if (valor < 0) {
-                        alert("O salário não pode ser negativo.");
-                        event.target.value = 0;
-                    }
-                });
-            </script>
-            
+            </div>
         </div>
-    </div>
+
+        <!-- Botão de Envio -->
+        <div class="button-container">
+            <button type="submit">Enviar</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Validação para o campo de salário base
+    document.getElementById('salario_base').addEventListener('input', function (event) {
+        var valor = event.target.value;
+        if (valor < 0) {
+            alert("O salário não pode ser negativo.");
+            event.target.value = 0;
+        }
+    });
+</script>
 
 {% endblock %}

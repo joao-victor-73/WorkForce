@@ -1,0 +1,101 @@
+.all {
+    margin-left: 80px;
+}
+/* Garante que o layout das seções sejam organizadas lado a lado */
+.informacoes {
+    margin-left: 50px;
+    margin-top: 20px;
+}
+
+/* Contêiner geral que organiza as seções lado a lado */
+.informacoes-container {
+    display: flex; /* Utiliza flexbox */
+    flex-wrap: wrap; /* Permite que os itens se movam para a linha de baixo quando necessário */
+    gap: 20px; /* Espaço entre os itens */
+    justify-content: flex-start; /* Alinha os itens à esquerda */
+    border-radius: 10px; /* Arredonda as bordas */
+    padding: 20px; /* Adiciona padding interno para dar espaço à borda */
+}
+
+/* Ajusta as seções para que elas ocupem o espaço disponível igualmente */
+.dados-pessoais, .informacoes-emprego, .informacoes-salariais {
+    flex: 1; /* Faz com que cada seção ocupe o espaço disponível igualmente */
+    min-width: 300px; /* Define um tamanho mínimo para as seções */
+    max-width: 48%; /* Limita a largura máxima das seções para evitar que fiquem grandes demais */
+    border: 2px solid #f97316; /* Borda laranja para as seções */
+    padding: 20px; /* Adiciona padding interno para dar espaço dentro da borda */
+    border-radius: 10px; /* Arredonda as bordas das seções */
+}
+
+/* Estilo para os grupos de campos dentro das seções */
+.textfield-group {
+    display: flex; /* Usa flexbox para os campos ficarem lado a lado */
+    justify-content: space-between; /* Distribui o espaço igualmente entre os campos */
+    gap: 20px; /* Espaço entre os campos */
+    margin-bottom: 15px; /* Espaço abaixo dos grupos */
+}
+
+/* Estilo individual dos campos de entrada */
+.textfield {
+    flex: 1; /* Faz com que cada campo ocupe a largura restante */
+}
+
+input[type="text"], input[type="email"], input[type="date"], select {
+    width: 100%; /* Faz os inputs ocuparem toda a largura disponível */
+    padding: 10px; /* Adiciona mais padding para melhorar a usabilidade */
+    margin-top: 5px;
+    border: 1px solid #ccc; /* Borda cinza nas caixas de formulário */
+    border-radius: 5px; /* Arredonda os cantos dos inputs */
+    font-size: 16px; /* Aumenta o tamanho da fonte para facilitar a leitura */
+    background-color: #f0f0f0; /* Fundo cinza claro nas caixas de entrada */
+}
+
+/* Estilo para o botão de enviar */
+.form-button {
+    padding: 12px 20px;
+    background-color: #f97316; /* Cor de fundo verde */
+    color: white; /* Cor da fonte */
+    border: none;
+    margin-left: 35px;
+    border-radius: 5px;
+    cursor: pointer; /* Adiciona o cursor de "mãozinha" no botão */
+    font-size: 16px; /* Aumenta o tamanho da fonte */
+    transition: background-color 0.3s ease; /* Adiciona uma transição suave para a cor do botão */
+    margin-top: 20px;
+}
+
+.form-button:hover {
+    background-color: #0056b3; /* Muda a cor do botão ao passar o mouse */
+}
+
+/* Estilo para o botão de voltar */
+.back-button {
+    background-color: #f97316;
+    padding: 12px 20px;
+    text-decoration: none;
+    color: white;
+    border-radius: 5px;
+    font-size: 16px;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+    background-color: #0056b3; /* Muda a cor do botão de voltar ao passar o mouse */
+}
+
+/* Para garantir uma boa responsividade em telas menores */
+@media (max-width: 768px) {
+    .informacoes-container {
+        flex-direction: column; /* Empilha as seções verticalmente em telas pequenas */
+    }
+
+    .dados-pessoais, .informacoes-emprego, .informacoes-salariais {
+        max-width: 100%; /* Garante que as seções ocupem 100% da largura em telas pequenas */
+    }
+
+    .textfield-group {
+        flex-direction: column; /* Empilha os campos em telas pequenas */
+        gap: 10px; /* Reduz o espaço entre os campos */
+    }
+}

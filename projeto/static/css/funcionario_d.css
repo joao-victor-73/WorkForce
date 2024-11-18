@@ -1,0 +1,114 @@
+/* Contêiner geral para os cards */
+.cards-container {
+    width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+    margin-left: 150px; /* Ajuste de margem para posicionar */
+    display: flex;
+    justify-content: space-between;  /* Distribui os cards igualmente */
+    gap: 20px; /* Espaço entre os cards */
+    flex-wrap: wrap; /* Permite que os cards quebrem para a linha seguinte */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 70px;
+}
+
+/* Estilo individual dos cards */
+.card {
+    flex: 1; /* Faz com que todos os cards ocupem o mesmo espaço */
+    min-width: 300px; /* Largura mínima */
+    max-width: 32%; /* Define um limite de largura */
+    background-color: #fff; /* Fundo branco */
+    padding: 20px; /* Preenchimento dentro do card */
+    border-radius: 8px; /* Borda arredondada */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    transition: transform 0.3s, box-shadow 0.3s; /* Animação suave */
+}
+
+/* Efeito de hover nos cards */
+.card:hover {
+    transform: translateY(-5px); /* Card sobe levemente */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Sombra mais forte */
+}
+
+/* Cabeçalho dos cards */
+.card-header h3 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Estilo do corpo do card */
+.card-body {
+    font-size: 1rem;
+    color: #000000;
+}
+
+/* Títulos dentro do card */
+.card-body p {
+    margin-bottom: 15px;
+}
+
+/* Estilos para o footer dos cards (botões) */
+.card-footer {
+    margin-top: 20px;
+    display: flex;
+    margin-left:170px;
+    gap: 10px;
+}
+
+/* Estilo dos botões no card */
+.card-footer a {
+    text-align: center;
+    padding: 12px 20px;
+    font-size: 1rem;
+    background-color: #f97316;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+
+.card-footer a:hover {
+    background-color: #191970;
+}
+
+/* Responsividade para o layout */
+@media (max-width: 768px) {
+    .cards-container {
+        flex-direction: column; /* Empilha os cards verticalmente em telas pequenas */
+        gap: 10px;
+    }
+    
+    .card {
+        max-width: 100%; /* Faz os cards ocuparem toda a largura disponível */
+        margin: 0; /* Remove margens laterais */
+    }
+}
+
+/* Estilo para as seções de título dos cards */
+.card-header {
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Estilo para o botão de voltar */
+.btn-secondary {
+    background-color: #ccc;
+    padding: 12px 20px;
+    text-decoration: none;
+    color: #000;
+    border-radius: 5px;
+    font-size: 16px;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background-color: #bbb; /* Muda a cor do botão de voltar ao passar o mouse */
+}

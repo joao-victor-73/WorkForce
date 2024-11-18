@@ -1,0 +1,168 @@
+.all {
+    margin-left: 80px;
+}
+/* Estilo do título principal */
+h1 {
+    margin-left: 50px;
+    margin-top: 20px;
+    color: #333;
+}
+
+/* Estilo do título secundário (mesmo que o "h5") */
+h5 {
+    margin-left: 50px;
+    color: #555;
+}
+
+/* Container principal (aqui estamos aumentando as laterais) */
+.main-container {
+    width: 200%; 
+    margin-top: 20px;
+    max-width: 1500px; /* Max largura maior para telas grandes */
+    margin-left: 40px;
+    background-color: transparent;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    height: auto; /* Definindo altura automática para se ajustar ao conteúdo */
+}
+
+/* Ajustando o padding de outras seções para reduzir altura */
+.section-container {
+    display: flex;
+    gap: 10px; /* Menos espaçamento entre as seções */
+    margin-bottom: 20px; /* Menos espaço entre as seções */
+}
+
+/* Seções individuais */
+.section {
+    height: auto;
+    flex: 1;
+    background-color: #fff;
+    padding: 10px; /* Menos padding dentro das seções */
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Outras ajustes como redução de margens ou paddings em listas, botões, etc. */
+.list-group-item {
+    padding: 5px 10px; /* Menos padding nos itens de lista */
+    margin-bottom: 5px; /* Menos margem entre os itens */
+}
+
+.card-header {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.card-body {
+    font-size: 1rem;
+    color: #555;
+}
+
+.card-body p {
+    margin-bottom: 10px;
+}
+
+/* Estilo das listas de proventos e deduções */
+.list-group-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    padding: 10px 20px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.list-group-item .item-content {
+    color: #555;
+    font-size: 1rem;
+}
+
+.list-group-item .badge {
+    font-size: 1rem;
+    padding: 5px 10px;
+    border-radius: 20px;
+}
+
+.list-group-item .badge.bg-success {
+    background-color: #28a745;
+}
+
+.list-group-item .badge.bg-danger {
+    background-color: #dc3545;
+}
+
+.list-group-item .badge.bg-secondary {
+    background-color: #6c757d;
+}
+
+/* Estilo do botão para adicionar proventos ou deduções */
+.btn-secondary {
+    padding: 6px 12px;
+    font-size: 1rem;
+    background-color: #f97316;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: normal; /* Removendo o negrito */
+}
+
+.btn-secondary:hover {
+    background-color: #191970;
+}
+
+/* Estilo dos totais */
+.section .list-group-item {
+    font-weight: bold;
+}
+
+/* Estilo do footer da página */
+.card-footer {
+    display: flex;
+    padding: 10px 20px;
+    border-top: 1px solid #ccc;
+    border-radius: 0 0 8px 8px;
+}
+
+.card-footer a {
+    padding: 10px 20px;
+    font-size: 1rem;
+    margin-left: 50px;
+    color: #fff;
+    background-color: #f97316;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.card-footer a:hover {
+    background-color: #191970;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .main-container {
+        width: 100%; /* Largura total em telas menores */
+        padding: 20px; /* Menos padding nas laterais em telas pequenas */
+    }
+
+    .section-container {
+        flex-direction: column;
+    }
+
+    .card-header {
+        font-size: 1rem;
+    }
+
+    .list-group-item {
+        font-size: 0.9rem;
+    }
+
+    .btn-secondary, .card-footer a {
+        font-size: 0.9rem;
+    }
+}

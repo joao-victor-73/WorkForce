@@ -1,79 +1,85 @@
 {% extends 'base.html' %}
 
 {% block conteudo %}
-    <div>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/Editar.css') }}">
+<div class="all">
+<section class="informacoes">
+    <header>
         <h2>Informações Pessoais</h2>
-        <div>
-            <form action="{{url_for('atualizar_informacoes')}}" method='POST'>
-                
-                <input type="hidden" name="id_pessoa" value="{{ funcionario.fk_id_pessoa }}">
-                <input type="hidden" name="id_func" value="{{ funcionario.id_func }}">
+    </header>
+    <form action="{{url_for('atualizar_informacoes')}}" method='POST'>
+        <input type="hidden" name="id_pessoa" value="{{ funcionario.fk_id_pessoa }}">
+        <input type="hidden" name="id_func" value="{{ funcionario.id_func }}">
 
-                <div class="textfield">
-                    <label for="nomeCompleto">Nome Completo:</label>
-                    <input type="text" name="nome" placeholder="Nome Completo" value="{{ pessoa.nome }}" required>
+        <div class="informacoes-container">
+            <!-- Informações Pessoais -->
+            <fieldset class="dados-pessoais">
+                <legend>Dados Pessoais</legend>
+                <div class="textfield-group">
+                    <div class="textfield">
+                        <label for="nomeCompleto">Nome Completo:</label>
+                        <input type="text" name="nome" placeholder="Nome Completo" value="{{ pessoa.nome }}" required>
+                    </div>
+                    <div class="textfield">
+                        <label for="cpf">CPF:</label>
+                        <input type="text" name="cpf" placeholder="CPF" value="{{ pessoa.cpf }}" required>
+                    </div>
                 </div>
 
-                <div class="textfield">
-                    <label for="cpf">CPF:</label>
-                    <input type="text" name="cpf" placeholder="CPF:" value="{{pessoa.cpf}}" required>
+                <div class="textfield-group">
+                    <div class="textfield">
+                        <label for="tel1">Número para contato 1:</label>
+                        <input type="text" name="tel1" placeholder="Número para contato 1" value="{{ pessoa.tel1 }}">
+                    </div>
+                    <div class="textfield">
+                        <label for="tel2">Número para contato 2:</label>
+                        <input type="text" name="tel2" placeholder="Número para contato 2" value="{{ pessoa.tel2 }}">
+                    </div>
                 </div>
 
-                <div class="textfield">
-                    <label for="dataNascimento">Data de Nascimento:</label>
-                    <input type="date" name="data_nascimento" value="{{ pessoa.data_nascimento }}">
-                </div>
-                
-                <div class="textfield">
-                    <label for="tel1">Número para contato 1:</label>
-                    <input type="text"  name="tel1" placeholder="Número para contato 1" value="{{ pessoa.tel1 }}">
-                </div>
-
-                <div class="textfield">
-                    <label for="tel2">Número para contato 2:</label>
-                    <input type="text"  name="tel2" placeholder="Número para contato 2" value="{{ pessoa.tel2 }}">
-                </div>
-                
-                <div class="textfield">
-                    <label for="rua">Rua:</label>
-                    <input type="text"  name="rua" placeholder="Rua" value="{{ pessoa.rua }}">
+                <div class="textfield-group">
+                    <div class="textfield">
+                        <label for="rua">Rua:</label>
+                        <input type="text" name="rua" placeholder="Rua" value="{{ pessoa.rua }}">
+                    </div>
+                    <div class="textfield">
+                        <label for="bairro">Bairro:</label>
+                        <input type="text" name="bairro" placeholder="Bairro" value="{{ pessoa.bairro }}">
+                    </div>
                 </div>
 
-                <div class="textfield">
-                    <label for="bairro">Bairro:</label>
-                    <input type="text"  name="bairro" placeholder="Bairro" value="{{ pessoa.bairro }}">
+                <div class="textfield-group">
+                    <div class="textfield">
+                        <label for="num_residencia">Número da Residência:</label>
+                        <input type="text" name="num_residencia" placeholder="Número da Residência" value="{{ pessoa.num_residencia }}">
+                    </div>
+                    <div class="textfield">
+                        <label for="cidade">Cidade:</label>
+                        <input type="text" name="cidade" placeholder="Cidade" value="{{ pessoa.cidade }}">
+                    </div>
                 </div>
 
-                <div class="textfield">
-                    <label for="num_residencia">Número da Residência:</label>
-                    <input type="text"  name="num_residencia" placeholder="Número da Residência:" value="{{ pessoa.num_residencia }}">
+                <div class="textfield-group">
+                    <div class="textfield">
+                        <label for="cep">CEP:</label>
+                        <input type="text" name="cep" placeholder="CEP" value="{{ pessoa.cep }}">
+                    </div>
                 </div>
+            </fieldset>
 
-                <div class="textfield">
-                    <label for="cidade">Cidade:</label>
-                    <input type="text" name="cidade" placeholder="Cidade" value="{{ pessoa.cidade }}">
-                </div>
-
-                <div class="textfield">
-                    <label for="cep">CEP:</label>
-                    <input type="text" name="cep" placeholder="CEP" value="{{ pessoa.cep }}">
-                </div>
-                
-
-                <br> 
-
-
-                <h2>Informações do Emprego</h2>
+            <!-- Informações do Emprego -->
+            <fieldset class="informacoes-emprego">
+                <legend>Informações do Emprego</legend>
                 <div class="textfield">
                     <label for="email">E-mail:</label>
-                    <input type="email" name="email" placeholder="E-mail"value="{{ funcionario.email }}" >
+                    <input type="email" name="email" placeholder="E-mail" value="{{ funcionario.email }}">
                 </div>
 
                 <div class="textfield">
                     <label for="data_contratacao">Data de Contratação:</label>
                     <input type="date" name="data_contratacao" value="{{ funcionario.data_contratacao }}" required>
                 </div>
-                
+
                 <div class="textfield">
                     <label for="cargo">Cargo:</label>
                     <input type="text" name="cargo" placeholder="Cargo" value="{{ funcionario.nome_cargo }}" required>
@@ -89,7 +95,7 @@
                         {% endfor %}
                     </select>
                 </div>
-                
+
                 <div class="textfield">
                     <label for="status">Status:</label>
                     <select name="status" required>
@@ -99,23 +105,24 @@
                         <option value="ATESTADO" {% if funcionario.status_func == 'ATESTADO' %}selected{% endif %}>Atestado</option>
                     </select>
                 </div>
+            </fieldset>
 
-
-                <h2>Informações Salariais</h2>
-
+            <!-- Informações Salariais -->
+            <fieldset class="informacoes-salariais">
+                <legend>Informações Salariais</legend>
                 {% if folha_pagamento %}
                     <div class="textfield">
-                        <label for="nome_banco">Nome do Banco: </label>
+                        <label for="nome_banco">Nome do Banco:</label>
                         <input type="text" name="nome_banco" value="{{ folha_pagamento.nome_banco }}" required>
                     </div>
 
                     <div class="textfield">
-                        <label for="num_agencia">Número da agência: </label>
+                        <label for="num_agencia">Número da agência:</label>
                         <input type="text" name="num_agencia" value="{{ folha_pagamento.num_agencia }}" required>
                     </div>
 
                     <div class="textfield">
-                        <label for="conta_deposito">Conta de deposito: </label>
+                        <label for="conta_deposito">Conta de depósito:</label>
                         <input type="text" name="conta_deposito" value="{{ folha_pagamento.conta_deposito }}" required>
                     </div>
 
@@ -132,23 +139,26 @@
                     <div class="textfield">
                         <label for="tipo_contratacao">Tipo:</label>
                         <select name="tipo_contratacao">
-                            <option value="HORISTA" {% if folha_pagamento.tipo == 'HORISTA' %} selected {% endif %}>Horista</option>
-                            <option value="FOLGUISTA" {% if folha_pagamento.tipo == 'FOLGUISTA' %} selected {% endif %}>Folguista</option>
-                            <option value="INTERMITENTE" {% if folha_pagamento.tipo == 'INTERMITENTE' %} selected {% endif %}>Intermitente</option>
-                            <option value="MENSALISTA" {% if folha_pagamento.tipo == 'MENSALISTA' %} selected {% endif %}>Mensalista</option>
-                            <option value="PJ" {% if folha_pagamento.tipo == 'PJ' %} selected {% endif %}>PJ</option>
+                            <option value="HORISTA" {% if folha_pagamento.tipo == 'HORISTA' %}selected{% endif %}>Horista</option>
+                            <option value="FOLGUISTA" {% if folha_pagamento.tipo == 'FOLGUISTA' %}selected{% endif %}>Folguista</option>
+                            <option value="INTERMITENTE" {% if folha_pagamento.tipo == 'INTERMITENTE' %}selected{% endif %}>Intermitente</option>
+                            <option value="MENSALISTA" {% if folha_pagamento.tipo == 'MENSALISTA' %}selected{% endif %}>Mensalista</option>
+                            <option value="PJ" {% if folha_pagamento.tipo == 'PJ' %}selected{% endif %}>PJ</option>
                         </select>
                     </div>
-
                 {% else %}
                     <p>Esse funcionário não possui uma folha de pagamento cadastrada.</p>
-                
                 {% endif %}
-
-                <button type="submit">Salvar Informações</button>
-                <button> <a href="{{ url_for('lista_de_funcionarios') }}"> Voltar </a> </button>
-            </form>
+            </fieldset>
         </div>
-    </div>
 
+       <!-- Botões de Ação -->
+<div class="actions">
+    <button type="submit" class="form-button">Salvar Informações</button>
+    <a href="{{ url_for('lista_de_funcionarios') }}" class="back-button">Voltar</a>
+</div>
+
+    </form>
+</section>
+</div>
 {% endblock %}

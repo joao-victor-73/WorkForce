@@ -2,8 +2,9 @@ from flask import Flask, render_template, request, redirect, session, flash, url
 from flask_sqlalchemy import SQLAlchemy  # pip install flask-SQLAlchemy
 import enum
 from datetime import datetime, timezone
-# pip install weasyprint (biblioteca para importar p/ PDF)
 from weasyprint import HTML
+# pip install weasyprint (biblioteca para importar p/ PDF)
+# https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer/releases
 import io
 
 

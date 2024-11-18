@@ -1,40 +1,48 @@
 {% extends 'base.html' %}
 
 {% block conteudo %}
-
-    <div>
-        <a href="{{ url_for('gerar_listaFuncionarios_pdf') }}" class="btn btn-primary">Imprimir Lista de funcionarios</a>
+<div class="all">
+    <div class="titulo-principal">
+        <h1>Lista de Funcionários</h1>
+    </div>
+    <div class="lista-header">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/lista.css') }}">
+        <a href="{{ url_for('gerar_listaFuncionarios_pdf') }}" class="btn btn-primary">Imprimir Lista de funcionários</a>
     </div>
 
-    <table class="table table-striped table-responsive table-bordered">
-        <thead class="thead-default">
-            <tr>
-                <th> ID </th>
-                <th> Nome </th>
-                <th> Departamento </th>
-                <th> Cargo </th>
-                <th> Data de Contratação </th>
-                <th> Status do Funcionario </th>
-                <th> </th>
-            </tr>
-        </thead>
-
-        <tbody>
-            {% for funcionario, departamento in lista_func %}
+    <div class="lista-container">
+        <table class="table table-striped table-responsive table-bordered">
+            <thead class="thead-default">
                 <tr>
-                    <td>{{ funcionario.id_func }}</td>
-                    <td><a href="{{ url_for('funcionario_detalhes', id_func=funcionario.id_func) }}">{{ funcionario.pessoa.nome }}</a></td> <!-- Acessando o nome do funcionário através da relação (FK) -->
-                    <td>{{ departamento }}</td>
-                    <td>{{ funcionario.nome_cargo }}</td>
-                    <td>{{ funcionario.data_contratacao.strftime('%d/%m/%y') }}</td> <!-- Formatando o tipo de data -->
-                    <td>{{ funcionario.status_func }}</td> <!-- Acessa o valor do Enumm -->
-                    <td> 
-                        <a href="{{ url_for('editar_informacoes', id_func=funcionario.id_func) }}">Editar</a> 
-                        <a href="{{ url_for('deletar_informacoes', id_func=funcionario.id_func) }}">Deletar</a> 
-                    </td>
+                    <th> ID </th>
+                    <th> Nome </th>
+                    <th> Departamento </th>
+                    <th> Cargo </th>
+                    <th> Data de Contratação </th>
+                    <th> Status do Funcionário </th>
+                    <th> </th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
 
+            <tbody>
+                {% for funcionario, departamento in lista_func %}
+                    <tr>
+                        <td>{{ funcionario.id_func }}</td>
+                        <td><a href="{{ url_for('funcionario_detalhes', id_func=funcionario.id_func) }}">{{ funcionario.pessoa.nome }}</a></td>
+                        <td>{{ departamento }}</td>
+                        <td>{{ funcionario.nome_cargo }}</td>
+                        <td>{{ funcionario.data_contratacao.strftime('%d/%m/%y') }}</td>
+                        <td>{{ funcionario.status_func }}</td>
+                        <td>
+                            <div class="acoes">
+                                <a href="{{ url_for('editar_informacoes', id_func=funcionario.id_func) }}" class="acao-link">Editar</a>
+                                <a href="{{ url_for('deletar_informacoes', id_func=funcionario.id_func) }}" class="acao-link">Deletar</a>
+                            </div>                                              
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}

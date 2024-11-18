@@ -1,0 +1,79 @@
+/* CSS para centralizar o conteúdo */
+.all {
+    margin-left: 265px;
+    margin-top: 50px;
+}
+
+/* Adicionando o estilo para o form-container */
+.form-container {
+    width: 500%;
+    margin: 0 auto;    /* Centraliza o formulário na tela */
+    padding: 20px;
+    background-color: #f9f9f9;  /* Cor de fundo do formulário */
+    border-radius: 8px;  /* Bordas arredondadas */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);  /* Sombra suave */
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.form-header h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+}
+
+.form-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group {
+    margin-bottom: 15px;  /* Espaçamento entre os campos */
+}
+
+.form-group label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #555;
+    margin-bottom: 5px;  /* Espaço abaixo da label */
+    display: block;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #007bff;  /* Cor da borda quando o campo está em foco */
+}
+
+/* Estilo para o botão com a classe .btn-submit */
+.btn-submit {
+    padding: 10px 15px;
+    font-size: 16px;
+    background-color: #28a745;  /* Cor verde */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-submit:hover {
+    background-color: #218838;  /* Cor do botão quando estiver em hover */
+}
+
+.btn-submit:focus {
+    outline: none;  /* Remove o contorno padrão do botão */
+}

@@ -1,0 +1,127 @@
+/* Container do formulário */
+.form-container {
+    width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    margin-left: 260px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Grid layout para o formulário */
+.grid-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+}
+
+/* Seção do formulário */
+.form-section {
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Cabeçalho de cada seção */
+.form-section h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Estilo dos campos de texto */
+.textfield {
+    margin-bottom: 15px;
+}
+
+.textfield label {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.textfield input,
+.textfield select {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #f97316;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s;
+}
+
+.textfield input:focus,
+.textfield select:focus {
+    border-color: transparent;
+    outline: none;
+    background-color: #fff;
+}
+
+/* Estilo do container do botão */
+.button-container {
+    margin-top: 20px; /* Espaçamento superior */
+    text-align: center; /* Centraliza o botão */
+}
+
+/* Estilo do botão */
+button[type="submit"] {
+    width: 60%; /* Tamanho ajustado do botão */
+    padding: 12px 0; /* Ajusta o espaçamento do botão */
+    font-size: 1rem;
+    background-color: #f97316;
+    color: white;
+    
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button[type="submit"]:hover {
+    background-color: #191970;
+}
+
+/* Responsividade para o botão */
+@media (max-width: 768px) {
+    button[type="submit"] {
+        width: 80%; /* Aumenta o botão para se ajustar em telas pequenas */
+    }
+}
+
+/* Estilo das seções de formulário */
+.form-pessoais {
+    grid-column: span 1;
+}
+
+.form-emprego {
+    grid-column: span 1;
+}
+
+.form-salario {
+    grid-column: span 1;
+}
+
+/* Alinhamento de campos lado a lado */
+.textfield-group {
+    display: flex; /* Alinha os elementos lado a lado */
+    gap: 20px; /* Espaço entre os campos */
+    flex-wrap: wrap; /* Permite que os elementos se movam para a próxima linha caso não caibam na largura disponível */
+}
+
+.textfield {
+    flex: 1; /* Faz os elementos ocuparem o máximo de espaço possível */
+}
+
+.textfield input {
+    width: 100%; /* Faz o input ocupar toda a largura da div */
+    padding: 8px; /* Espaçamento dentro do campo de texto */
+    box-sizing: border-box; /* Garante que o padding não afete a largura total do input */
+}
+
+.titulo-cadastro {
+    margin-left: 625px;
+    
+}
