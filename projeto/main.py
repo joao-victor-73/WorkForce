@@ -3,10 +3,10 @@ from flask_sqlalchemy import SQLAlchemy  # pip install flask-SQLAlchemy
 
 # Para essas bibliotecas: pip install flask-login flask-wtf flask-bcrypt
 from flask_login import UserMixin, LoginManager, login_user, logout_user, login_required
-from flask_bcrypt import generate_password_hash, check_password_hash
+from flask_bcrypt import generate_password_hash, check_password_hash, Bcrypt
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Length, EqualTo
 
 import io
 import enum
@@ -26,6 +26,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 print('Banco de dados CONECTADO')
 db = SQLAlchemy(app)  # Instanciando a aplicação para o SQLAlchemy
 
+bcrypt = Bcrypt(app)
 
 # Configurações para gerenciar a autenticação de usuários.
 login_manager = LoginManager(app)
@@ -202,19 +203,25 @@ class LoginUsuarios(db.Model):
     senha_hash = db.Column(db.String(255), nullable=False)
     role = db.Column(db.Enum('ADMIN', 'USER'), default='USER')
     ativo = db.Column(db.Boolean, default=True)
-    fk_id_func = db.Column(db.Integer, db.ForeignKey('funcionarios.id_func'), nullable=False)
+    fk_id_func = db.Column(db.Integer, db.ForeignKey(
+        'funcionarios.id_func'), nullable=False)
 
     # Relacionamento
-    infor_func = db.relationship('Funcionarios', backref='login_usuarios', lazy=True)
+    infor_func = db.relationship(
+        'Funcionarios', backref='login_usuarios', lazy=True)
 
-    def set_password(self, senha):
+    def set_password(self, senha):  # Durante o Cadastro:
         # Este método é usado para definir a senha de um usuário ao cadastrá-lo no sistema.
-        self.senha_hash = generate_password_hash(senha).decode('utf-8')
+        self.senha_hash = bcrypt.generate_password_hash(
+            senha).decode('utf-8')
 
-    def check_password(self, senha):
+        # self.senha_hash: Atributo da classe (criptografado e armazenado no banco de dados).
+        # senha_digitada: Senha recebida em texto plano.
+
+    def check_password(self, senha):  # Durante o Login:
         # Este método verifica se a senha fornecida pelo usuário corresponde
         # ao hash armazenado no banco de dados.
-        return check_password_hash(self.senha_hash, senha)
+        return bcrypt.check_password_hash(self.senha_hash, senha)
 
 
 @login_manager.user_loader
@@ -228,15 +235,18 @@ def load_user(user_id):
 
 # Login
 class LoginForm(FlaskForm):
-    login_user = StringField('Nome de Usuário', validators=[DataRequired()])
+    login_user = StringField('Login', validators=[
+                             DataRequired(), Length(min=4, max=25)])
     senha_hash = PasswordField('Senha', validators=[DataRequired()])
     submit = SubmitField('Entrar')
 
-
 # Registro
-class RegistroForm(FlaskForm):
-    login_user = StringField('Nome de Usuário', validators=[DataRequired()])
-    senha_hash = PasswordField('Senha', validators=[DataRequired()])
+
+
+class RegisterForm(FlaskForm):
+    login_user = StringField('Login', validators=[DataRequired(), Length(min=4, max=25)])
+    senha = PasswordField('Senha', validators=[DataRequired(), Length(min=6)])
+    confirmar_senha = PasswordField('Confirmar Senha', validators=[DataRequired(), EqualTo('senha')])
     submit = SubmitField('Registrar')
 
 
@@ -724,51 +734,63 @@ def gerar_listaFuncionarios_pdf():
     return response
 
 
-# Rota para registrar usuários no login
-@app.route('/registro', methods=['GET', 'POST'])
-def registro():
-    form = RegistroForm()
-    
-    if form.validate_on_submit():
-        if LoginUsuarios.query.filter_by(login_user=form.login_user.data).first():
-            flash('Nome de usuário já existe.', 'danger')
-            return redirect(url_for('registro'))
-
-        novo_usuario = LoginUsuarios(login_user=form.login_user.data)
-        novo_usuario.set_password(form.senha_hash.data)
-        db.session.add(novo_usuario)
-        db.session.commit()
-
-        flash('Registro realizado com sucesso!', 'success')
-        return redirect(url_for('login'))
-    
-    return render_template('registro.html', form=form)
-
-
-# Rota para logar usuários no site
+# ROTA PARA LOGIN
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
-    
-    if form.validate_on_submit():
-        usuario = LoginUsuarios.query.filter_by(login_user=form.login_user.data).first()
 
-        if usuario and usuario.check_password(form.senha_hash.data):
-            login_user(usuario)
+    if form.validate_on_submit():
+        user = LoginUsuarios.query.filter_by(
+            login_user=form.login_user.data).first()
+        
+        # Verifica se o usuário foi encontrado no banco
+        print(f"Usuário encontrado: {user}")  # Verifica se o usuário foi encontrado
+        print(f"Senha fornecida: {form.senha_hash.data}")  # Verifica a senha fornecida
+        print(f"Senha armazenada: {user.senha_hash}")  # Verifica a senha criptografada no banco
+
+        if user and user.check_password(form.senha_hash.data):
+            print("Senha correta!")  # Confirma se a senha está correta
+            session['user_id'] = user.id
             flash('Login realizado com sucesso!', 'success')
             return redirect(url_for('index'))
-        
-        flash('Usuário ou senha inválidos.', 'danger')
-    
+        else:
+            print("Usuário ou senha incorretos!")  # Exibe erro no terminal
+            flash('Usuário ou senha inválidos.', 'danger')
     return render_template('login.html', form=form)
 
 
-# Rota para fazer logout
+# ROTA PARA REGISTRAR
+@app.route('/registrar', methods=['GET', 'POST'])
+def registrar():
+    form = RegisterForm()
+
+    if form.validate_on_submit():
+
+        novo_usuario = LoginUsuarios(login_user=form.login_user.data)
+
+        print("Senha antes da criptografia:", form.senha.data)  # Verificando a senha
+        novo_usuario.set_password(form.senha.data)
+        print("Senha criptografada:", novo_usuario.senha_hash)  # Verificando a senha criptografada
+
+        db.session.add(novo_usuario)
+        db.session.commit()
+
+        flash('Cadastro realizado com sucesso! Você já pode fazer login.', 'success')
+        return redirect(url_for('login'))
+    
+    else:
+        print(form.errors)  # Mostra os erros de validação
+
+    return render_template('registro.html', form=form)
+
+
+# ROTA PARA LOGOUT
 @app.route('/logout')
 def logout():
-    logout_user()
-    flash('Você saiu da conta.', 'info')
+    session.pop('user_id', None)
+    flash('Você saiu da sua conta.', 'info')
     return redirect(url_for('login'))
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
