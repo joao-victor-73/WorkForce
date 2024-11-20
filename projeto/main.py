@@ -2,10 +2,10 @@ from flask import Flask, render_template, request, redirect, session, flash, url
 from flask_sqlalchemy import SQLAlchemy  # pip install flask-SQLAlchemy
 
 # Para essas bibliotecas: pip install flask-login flask-wtf flask-bcrypt
-from flask_login import UserMixin, LoginManager, login_user, logout_user, login_required
+from flask_login import UserMixin, LoginManager, login_user, logout_user, login_required, current_user
 from flask_bcrypt import generate_password_hash, check_password_hash, Bcrypt
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
+from wtforms import SelectField, StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Length, EqualTo
 
 import io
@@ -195,7 +195,7 @@ class FolhaDeducoes(db.Model):
 
 
 # Modelo para Login de Usuários
-class LoginUsuarios(db.Model):
+class LoginUsuarios(db.Model, UserMixin):
     __tablename__ = 'login_usuarios'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -209,6 +209,12 @@ class LoginUsuarios(db.Model):
     # Relacionamento
     infor_func = db.relationship(
         'Funcionarios', backref='login_usuarios', lazy=True)
+
+    # Método is_active
+    @property
+    def is_active(self):
+        return self.ativo  # Retorna o valor da coluna ativo
+
 
     def set_password(self, senha):  # Durante o Cadastro:
         # Este método é usado para definir a senha de um usuário ao cadastrá-lo no sistema.
@@ -247,16 +253,31 @@ class RegisterForm(FlaskForm):
     login_user = StringField('Login', validators=[DataRequired(), Length(min=4, max=25)])
     senha = PasswordField('Senha', validators=[DataRequired(), Length(min=6)])
     confirmar_senha = PasswordField('Confirmar Senha', validators=[DataRequired(), EqualTo('senha')])
+    funcionario_id = SelectField('Funcionário', coerce=int, validators=[DataRequired()])
+    role = SelectField('Função', choices=[('USER', 'Usuário'), ('ADMIN', 'Administrador')], default='USER')
     submit = SubmitField('Registrar')
+
+    def __init__(self, *args, **kwargs):
+        super(RegisterForm, self).__init__(*args, **kwargs)
+        # Preencher o SelectField com todos os funcionários disponíveis no banco de dados
+        self.funcionario_id.choices = [(f.id_func, f.pessoa.nome) for f in Funcionarios.query.all()]
+
+        """
+        Essa última linha do método cria uma lista de tuplas, onde o primeiro valor é o 
+        `id_func` e o segundo é o nome do funcionário, para que o usuário selecione o funcionário.
+        """
 
 
 # ROTAS
+
 @app.route('/')
+@login_required
 def index():
     return render_template('index.html', titulo="Página principal")
 
 
 @app.route('/lista')
+@login_required
 def lista_de_funcionarios():
     # lista_func = Funcionarios.query.order_by(Funcionarios.id_func).all()
 
@@ -274,12 +295,14 @@ def lista_de_funcionarios():
 
 
 @app.route('/cadastro', methods=['POST', ])
+@login_required
 def cadastro_funcionario():
     return render_template('lista.html')
 
 
 # Essa rota, redireciona o usuário para o formulario de criação/cadastro
 @app.route('/novo_funcionario')
+@login_required
 def novo_funcionario():
     # Passando a lista de departamentos para ter opção na hora docadastramento
     lista_departamentos = Departamentos.query.all()
@@ -289,6 +312,7 @@ def novo_funcionario():
 
 # Essa rota coleta o que foi digitado no formulario e cria/cadastra o funcionário
 @app.route('/criando_funcionario', methods=['POST',])
+@login_required
 def criando_funcionario():
     # Requisitando as informações PESSOAIS:
     nome = request.form['nome']
@@ -453,6 +477,7 @@ def criando_funcionario():
 
 
 @app.route('/editar_informacoes/<int:id_func>')
+@login_required
 def editar_informacoes(id_func):
     # funcionario = Funcionarios.query.filter_by(id_func=id_func)
     # pessoa = Pessoas.query.filter_by(id_pessoa=funcionario.fk_id_pessoa)
@@ -472,6 +497,7 @@ def editar_informacoes(id_func):
 
 
 @app.route('/atualizar_informacoes', methods=['POST',])
+@login_required
 def atualizar_informacoes():
 
     # Atualiza as informações pessoais
@@ -529,6 +555,7 @@ def atualizar_informacoes():
 
 # Rota para mostrar todas as informações do funcionário
 @app.route('/funcionario_detalhes/<int:id_func>')
+@login_required
 def funcionario_detalhes(id_func):
     funcionario = Funcionarios.query.get_or_404(id_func)
     folha_pagamento = funcionario.folha_pagamento
@@ -540,6 +567,7 @@ def funcionario_detalhes(id_func):
 
 # Rota para deletar o cadastro de um funcionário
 @app.route('/deletar/<int:id_func>')
+@login_required
 def deletar_informacoes(id_func):
     funcionario = Funcionarios.query.get_or_404(id_func)
 
@@ -564,6 +592,7 @@ def deletar_informacoes(id_func):
 
 # Rota para criar folha de pagamentos do funcionário
 @app.route('/gerar_folha_pagamento/<int:id_func>')
+@login_required
 def gerar_folha_pagamento(id_func):
     # Buscar o funcionário
     funcionario = Funcionarios.query.get_or_404(id_func)
@@ -583,6 +612,7 @@ def gerar_folha_pagamento(id_func):
 
 # Rota para adicionar proventos a um funcionário
 @app.route('/add_proventos/<int:id_pagamento>', methods=['POST', 'GET'])
+@login_required
 def add_proventos(id_pagamento):
     folha_pagamento = Folha_pagamento.query.get_or_404(id_pagamento)
 
@@ -629,6 +659,7 @@ def add_proventos(id_pagamento):
 
 # Rota para adicionar deduções a um funcionário
 @app.route('/add_deducoes/<int:id_pagamento>', methods=['POST', 'GET'])
+@login_required
 def add_deducoes(id_pagamento):
     folha_pagamento = Folha_pagamento.query.get_or_404(id_pagamento)
 
@@ -674,6 +705,7 @@ def add_deducoes(id_pagamento):
 
 # Rota para gerar o PDF da folha de pagamento
 @app.route('/imprimir_folha_pagamento/<int:id_pagamento>')
+@login_required
 def imprimir_folha_pagamento(id_pagamento):
     # Recupera a folha de pagamento, proventos e deduções
     folha = Folha_pagamento.query.get_or_404(id_pagamento)
@@ -715,6 +747,7 @@ def imprimir_folha_pagamento(id_pagamento):
 # Rota para gerar uma lista de todos os funcionários em PDF
 # depois buscar entender cada coisa aqui, para não ficar perdido
 @app.route('/gerar_listaFuncionarios_pdf')
+@login_required
 def gerar_listaFuncionarios_pdf():
     # Buscar todos os funcionários do banco de dados
     lista_func = db.session.query(Funcionarios, Departamentos.nome_departamento).outerjoin(
@@ -740,8 +773,7 @@ def login():
     form = LoginForm()
 
     if form.validate_on_submit():
-        user = LoginUsuarios.query.filter_by(
-            login_user=form.login_user.data).first()
+        user = LoginUsuarios.query.filter_by(login_user=form.login_user.data).first()
         
         # Verifica se o usuário foi encontrado no banco
         print(f"Usuário encontrado: {user}")  # Verifica se o usuário foi encontrado
@@ -751,6 +783,11 @@ def login():
         if user and user.check_password(form.senha_hash.data):
             print("Senha correta!")  # Confirma se a senha está correta
             session['user_id'] = user.id
+            session['role'] = user.role # Armazena o nível de permissão na sessão
+
+            login_user(user)  # Salva o usuário na sessão
+
+
             flash('Login realizado com sucesso!', 'success')
             return redirect(url_for('index'))
         else:
@@ -765,18 +802,25 @@ def registrar():
     form = RegisterForm()
 
     if form.validate_on_submit():
+        # Recupera o funcionário já existente pelo ID
+        funcionario = Funcionarios.query.filter_by(id_func=form.funcionario_id.data).first()
 
-        novo_usuario = LoginUsuarios(login_user=form.login_user.data)
+        if funcionario:
+            novo_login = LoginUsuarios(login_user=form.login_user.data)
+            novo_login.set_password(form.senha.data)
+            novo_login.fk_id_func = funcionario.id_func  # Associando o login ao funcionário existente
+            novo_login.role = form.role.data  # Definir o role do usuário
 
-        print("Senha antes da criptografia:", form.senha.data)  # Verificando a senha
-        novo_usuario.set_password(form.senha.data)
-        print("Senha criptografada:", novo_usuario.senha_hash)  # Verificando a senha criptografada
+            
+            db.session.add(novo_login)
+            db.session.commit()
 
-        db.session.add(novo_usuario)
-        db.session.commit()
+            flash('Cadastro realizado com sucesso! Você já pode fazer login.', 'success')
+            return redirect(url_for('login'))
 
-        flash('Cadastro realizado com sucesso! Você já pode fazer login.', 'success')
-        return redirect(url_for('login'))
+        else:
+            flash('Funcionário não encontrado.', 'danger')
+
     
     else:
         print(form.errors)  # Mostra os erros de validação
