@@ -11,7 +11,7 @@
 <body>
     <div class="main-login">
         <div class="left-login">
-            <h1> Bem-vindo à <span class="highlight">WorkForce's</span>, <br> realize seu login agora mesmo! </h1>
+            <h1> Bem-vindo à <span class="highlight">WorkForce's</span>, <br> realize seu registro agora mesmo! </h1>
             <img src="{{ url_for('static', filename='image/animacao-rh.svg') }}" class="left-login-image" alt="animação">
         </div>        
 
@@ -19,24 +19,21 @@
             <div class="card-login">
                 <h1> ACESSO </h1>
                 
-                <form id="loginForm" method="POST">
-                    {{ form.hidden_tag() }}
-
-                    <div class="textfield">
-                        <label for="usuario">Usuário</label>
+                <!-- Formulário de Registro -->
+                <form method="POST">
+                    {{ form.hidden_tag() }}  <!-- Adiciona o CSRF token -->
+                    
+                    <div class="form-group">
+                        <label for="login_user">Nome de Usuário</label>
                         {{ form.login_user(class="form-control") }}
                     </div>
-                
-                    <div class="textfield">
-                        <label for="senha">Senha</label>
+                    
+                    <div class="form-group">
+                        <label for="senha_hash">Senha</label>
                         {{ form.senha_hash(class="form-control") }}
                     </div>
-
-                    <div id="message" style="color: red; display: none;"></div>
-                
-                    <div class="textfield">
-                        <button type="submit" class="btn-login"> ENTRAR</button>
-                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Registrar</button>
                 </form>
             </div>
         </div>

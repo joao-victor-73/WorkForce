@@ -1,11 +1,20 @@
 from flask import Flask, render_template, request, redirect, session, flash, url_for, send_file, make_response
 from flask_sqlalchemy import SQLAlchemy  # pip install flask-SQLAlchemy
+
+# Para essas bibliotecas: pip install flask-login flask-wtf flask-bcrypt
+from flask_login import UserMixin, LoginManager, login_user, logout_user, login_required
+from flask_bcrypt import generate_password_hash, check_password_hash
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, SubmitField
+from wtforms.validators import DataRequired
+
+import io
 import enum
 from datetime import datetime, timezone
+
 from weasyprint import HTML
 # pip install weasyprint (biblioteca para importar p/ PDF)
 # baixar também: https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer/releases
-import io
 
 
 app = Flask(__name__)
@@ -13,9 +22,22 @@ app.secret_key = 'random_key'
 
 # Fazendo a conexão com o banco de dados através do SQLAlchemy
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:darc147@localhost/workforce'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 print('Banco de dados CONECTADO')
-
 db = SQLAlchemy(app)  # Instanciando a aplicação para o SQLAlchemy
+
+
+# Configurações para gerenciar a autenticação de usuários.
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+"""
+login_view especifica o nome da rota onde está a página de login. Quando um usuário tentar 
+acessar uma rota protegida (decorada com @login_required) sem estar autenticado, ele será 
+automaticamente redirecionado para essa página (a /login).
+
+O valor de login_view deve corresponder ao nome da função que define a rota de login na 
+sua aplicação Flask.
+"""
 
 
 # Criando classe para as informações das tabelas
@@ -171,8 +193,54 @@ class FolhaDeducoes(db.Model):
         'deducoes_fpg.id_deducao'), nullable=False)
 
 
-# ROTAS
+# Modelo para Login de Usuários
+class LoginUsuarios(db.Model):
+    __tablename__ = 'login_usuarios'
 
+    id = db.Column(db.Integer, primary_key=True)
+    login_user = db.Column(db.String(50), unique=True, nullable=False)
+    senha_hash = db.Column(db.String(255), nullable=False)
+    role = db.Column(db.Enum('ADMIN', 'USER'), default='USER')
+    ativo = db.Column(db.Boolean, default=True)
+    fk_id_func = db.Column(db.Integer, db.ForeignKey('funcionarios.id_func'), nullable=False)
+
+    # Relacionamento
+    infor_func = db.relationship('Funcionarios', backref='login_usuarios', lazy=True)
+
+    def set_password(self, senha):
+        # Este método é usado para definir a senha de um usuário ao cadastrá-lo no sistema.
+        self.senha_hash = generate_password_hash(senha).decode('utf-8')
+
+    def check_password(self, senha):
+        # Este método verifica se a senha fornecida pelo usuário corresponde
+        # ao hash armazenado no banco de dados.
+        return check_password_hash(self.senha_hash, senha)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    # Este decorador é usado para informar ao Flask-Login como carregar um
+    # usuário a partir do seu ID armazenado na sessão.
+    return LoginUsuarios.query.get(int(user_id))
+
+
+# CRIANDO FÓRMULARIOS DE LOGIN E REGISTRO
+
+# Login
+class LoginForm(FlaskForm):
+    login_user = StringField('Nome de Usuário', validators=[DataRequired()])
+    senha_hash = PasswordField('Senha', validators=[DataRequired()])
+    submit = SubmitField('Entrar')
+
+
+# Registro
+class RegistroForm(FlaskForm):
+    login_user = StringField('Nome de Usuário', validators=[DataRequired()])
+    senha_hash = PasswordField('Senha', validators=[DataRequired()])
+    submit = SubmitField('Registrar')
+
+
+# ROTAS
 @app.route('/')
 def index():
     return render_template('index.html', titulo="Página principal")
@@ -621,7 +689,7 @@ def imprimir_folha_pagamento(id_pagamento):
                                    deducoes=deducoes,
                                    total_proventos=total_proventos,
                                    total_deducoes=total_deducoes,
-                                   salario_liquido=salario_liquido, 
+                                   salario_liquido=salario_liquido,
                                    funcionario=funcionario)
 
     # Criar o PDF a partir do HTML
@@ -635,13 +703,16 @@ def imprimir_folha_pagamento(id_pagamento):
 
 
 # Rota para gerar uma lista de todos os funcionários em PDF
+# depois buscar entender cada coisa aqui, para não ficar perdido
 @app.route('/gerar_listaFuncionarios_pdf')
 def gerar_listaFuncionarios_pdf():
     # Buscar todos os funcionários do banco de dados
-    lista_func = db.session.query(Funcionarios, Departamentos.nome_departamento).outerjoin(Departamentos, Funcionarios.fk_id_departamento == Departamentos.id_departamento).all()
+    lista_func = db.session.query(Funcionarios, Departamentos.nome_departamento).outerjoin(
+        Departamentos, Funcionarios.fk_id_departamento == Departamentos.id_departamento).all()
 
     # Renderizar o template HTML com a lista de funcionários
-    rendered = render_template('pdf_listaFuncionarios.html', lista_func=lista_func)
+    rendered = render_template(
+        'pdf_listaFuncionarios.html', lista_func=lista_func)
 
     # Converter o HTML para PDF usando o WeasyPrint
     pdf = HTML(string=rendered).write_pdf()
@@ -653,10 +724,56 @@ def gerar_listaFuncionarios_pdf():
     return response
 
 
-@app.route("/login")
-def login_para_usuarios():
-    return render_template('login.html')
+# Rota para registrar usuários no login
+@app.route('/registro', methods=['GET', 'POST'])
+def registro():
+    form = RegistroForm()
+    
+    if form.validate_on_submit():
+        if LoginUsuarios.query.filter_by(login_user=form.login_user.data).first():
+            flash('Nome de usuário já existe.', 'danger')
+            return redirect(url_for('registro'))
 
+        novo_usuario = LoginUsuarios(login_user=form.login_user.data)
+        novo_usuario.set_password(form.senha_hash.data)
+        db.session.add(novo_usuario)
+        db.session.commit()
+
+        flash('Registro realizado com sucesso!', 'success')
+        return redirect(url_for('login'))
+    
+    return render_template('registro.html', form=form)
+
+
+# Rota para logar usuários no site
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    
+    if form.validate_on_submit():
+        usuario = LoginUsuarios.query.filter_by(login_user=form.login_user.data).first()
+
+        if usuario and usuario.check_password(form.senha_hash.data):
+            login_user(usuario)
+            flash('Login realizado com sucesso!', 'success')
+            return redirect(url_for('index'))
+        
+        flash('Usuário ou senha inválidos.', 'danger')
+    
+    return render_template('login.html', form=form)
+
+
+# Rota para fazer logout
+@app.route('/logout')
+def logout():
+    logout_user()
+    flash('Você saiu da conta.', 'info')
+    return redirect(url_for('login'))
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
+
+
+# pip freeze > requirements.txt
+
+# pip install -r requirements.txt
