@@ -288,8 +288,7 @@ def lista_de_funcionarios():
     ).outerjoin(Departamentos, Funcionarios.fk_id_departamento == Departamentos.id_departamento).all()
 
     for funcionario, departamento in lista_func:
-        print(f"Funcionário: {funcionario.pessoa.nome}, Departamento: {
-              departamento}, Status {funcionario.status_func}")
+        print(f"Funcionário: {funcionario.pessoa.nome}, Departamento: {departamento}, Status {funcionario.status_func}")
 
     return render_template('lista.html', lista_func=lista_func, titulo="Lista de Funcionários")
 
@@ -843,3 +842,5 @@ if __name__ == '__main__':
 # pip freeze > requirements.txt
 
 # pip install -r requirements.txt
+
+# web: gunicorn main:app
