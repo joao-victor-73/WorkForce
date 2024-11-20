@@ -615,8 +615,14 @@ def imprimir_folha_pagamento(id_pagamento):
     salario_liquido = salario_base + total_proventos - total_deducoes
 
     # Gerar HTML para o PDF (pensar em uma maneira melhor de passar tudo isso para o html)
-    html_content = render_template('pdf_folhaPagamento.html', folha=folha, proventos=proventos, deducoes=deducoes,
-                                   total_proventos=total_proventos, total_deducoes=total_deducoes, salario_liquido=salario_liquido, funcionario=funcionario)
+    html_content = render_template('pdf_folhaPagamento.html',
+                                   folha=folha,
+                                   proventos=proventos,
+                                   deducoes=deducoes,
+                                   total_proventos=total_proventos,
+                                   total_deducoes=total_deducoes,
+                                   salario_liquido=salario_liquido, 
+                                   funcionario=funcionario)
 
     # Criar o PDF a partir do HTML
     pdf = HTML(string=html_content).write_pdf()
@@ -645,6 +651,11 @@ def gerar_listaFuncionarios_pdf():
     response.headers['Content-Type'] = 'application/pdf'
     response.headers['Content-Disposition'] = 'inline; filename=lista_funcionarios.pdf'
     return response
+
+
+@app.route("/login")
+def login_para_usuarios():
+    return render_template('login.html')
 
 
 if __name__ == '__main__':

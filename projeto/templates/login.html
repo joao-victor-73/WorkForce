@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/Login.css') }}">
+    <title>Login</title>
+    <link rel="icon" href="Imagens/logotipo.projeto.workforces.png" type="image/png">
+</head>
+
+<body>
+    <div class="main-login">
+        <div class="left-login">
+            <h1> Bem-vindo à <span class="highlight">WorkForce's</span>, <br> realize seu login agora mesmo! </h1>
+            <img src="{{ url_for('static', filename='image/animacao-rh.svg') }}" class="left-login-image" alt="animação">
+        </div>        
+
+        <div class="right-login"> 
+            <div class="card-login">
+                <h1> ACESSO </h1>
+                
+                <form id="loginForm">
+                    <div class="textfield">
+                        <label for="usuario">Usuário</label>
+                        <input type="text" id="login" name="usuario" placeholder="Usuário" required>
+                    </div>
+                
+                    <div class="textfield">
+                        <label for="senha">Senha</label>
+                        <input type="password" id="senha" name="senha" placeholder="Senha" required>
+                    </div>
+
+                    <div id="message" style="color: red; display: none;"></div>
+                
+                    <div class="textfield">
+                        <button type="submit" class="btn-login">Login</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Adicionando o script externo -->
+    <script src="{{ url_for('static', filename='js/Login.js') }}"></script>
+</body>
+</html>
