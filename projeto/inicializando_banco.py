@@ -7,7 +7,7 @@ try:
     conectar = mysql.connector.connect(
         host='127.0.0.1',
         user='root',
-        password='jose2004'
+        password='darc147'
     )
 except mysql.connector.Error as err:
     if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -193,6 +193,24 @@ TABLES['folha_deducoes'] = ('''
             REFERENCES deducoes_fpg(`id_deducao`) 
             ON DELETE CASCADE
 );''')
+
+
+# CRIANDO TABELA LOGIN
+# Servirá para armazenar os registros para logar no sistema
+TABLES['login_usuarios'] = ('''
+    `id` INT PRIMARY KEY AUTO_INCREMENT,
+    `login_user` VARCHAR(50) NOT NULL UNIQUE,
+    `senha_hash` VARCHAR(255) NOT NULL,
+    `role` ENUM('ADMIN', 'USER') DEFAULT 'USER',
+    `ativo` BOOLEAN DEFAULT TRUE,
+    `fk_id_func` INT,
+
+    CONSTRAINT `fk_login_funcionarios`
+    FOREIGN KEY(`fk_id_func`)
+    REFERENCES funcionarios(`id_func`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+); ''')
 
 
 # Criando um loop for para percorrer o dicionario TABLES

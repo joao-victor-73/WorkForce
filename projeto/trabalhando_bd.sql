@@ -150,6 +150,25 @@ CREATE TABLE folha_deducoes (
 );
 
 
+-- CRIANDO TABELA LOGIN
+-- Servirá para armazenar os registros para logar no sistema
+CREATE TABLE login_usuarios (
+	id INT PRIMARY KEY AUTO_INCREMENT,
+    login_user VARCHAR(50) NOT NULL UNIQUE,
+    senha_hash VARCHAR(255) NOT NULL, 
+    role ENUM('ADMIN', 'USER') DEFAULT 'USER',
+    ativo BOOLEAN DEFAULT TRUE,
+    fk_id_func INT,
+    
+    CONSTRAINT fk_login_funcionarios
+		FOREIGN KEY (fk_id_func)
+        REFERENCES funcionarios(id_func)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+
+
 -- INSERINDO REGISTROS NAS TABELAS
 -- Os INSERT's servirão para fazer testes na aplicação, não são de extrema necessidade
 -- Para fazer a inserção dos dados, seguir a ordem como está
@@ -218,3 +237,10 @@ VALUES
 (2, 3),  -- Relaciona o Plano de Saúde com o pagamento 2
 (3, 1),
 (3, 2);
+
+
+-- Inserindo Logins para os usuários
+INSERT INTO login_usuarios (login_user, senha_hash, role, fk_id_func) 
+VALUES
+('alice', '123456', 'admin', '1'),
+('carlos', '654321', 'admin', '2');

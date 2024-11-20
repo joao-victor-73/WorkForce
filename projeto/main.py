@@ -4,7 +4,7 @@ import enum
 from datetime import datetime, timezone
 from weasyprint import HTML
 # pip install weasyprint (biblioteca para importar p/ PDF)
-# https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer/releases
+# baixar também: https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer/releases
 import io
 
 
