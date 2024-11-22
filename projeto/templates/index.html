@@ -2,6 +2,24 @@
 
 {% block conteudo %}
 
-    
+<div class="container mt-5">
+    <h1 class="mb-4">Informações por Departamento</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Departamento</th>
+                <th>Total de Funcionários</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for depto in departamentos %}
+            <tr>
+                <td>{{ depto[0] }}</td>
+                <td>{{ depto[1] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 {% endblock %}

@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, session, flash, url_for, send_file, make_response
 from flask_sqlalchemy import SQLAlchemy  # pip install flask-SQLAlchemy
+from sqlalchemy import func
 
 # Para essas bibliotecas: pip install flask-login flask-wtf flask-bcrypt
 from flask_login import UserMixin, LoginManager, login_user, logout_user, login_required, current_user
@@ -215,7 +216,6 @@ class LoginUsuarios(db.Model, UserMixin):
     def is_active(self):
         return self.ativo  # Retorna o valor da coluna ativo
 
-
     def set_password(self, senha):  # Durante o Cadastro:
         # Este método é usado para definir a senha de um usuário ao cadastrá-lo no sistema.
         self.senha_hash = bcrypt.generate_password_hash(
@@ -250,17 +250,22 @@ class LoginForm(FlaskForm):
 
 
 class RegisterForm(FlaskForm):
-    login_user = StringField('Login', validators=[DataRequired(), Length(min=4, max=25)])
+    login_user = StringField('Login', validators=[
+                             DataRequired(), Length(min=4, max=25)])
     senha = PasswordField('Senha', validators=[DataRequired(), Length(min=6)])
-    confirmar_senha = PasswordField('Confirmar Senha', validators=[DataRequired(), EqualTo('senha')])
-    funcionario_id = SelectField('Funcionário', coerce=int, validators=[DataRequired()])
-    role = SelectField('Função', choices=[('USER', 'Usuário'), ('ADMIN', 'Administrador')], default='USER')
+    confirmar_senha = PasswordField('Confirmar Senha', validators=[
+                                    DataRequired(), EqualTo('senha')])
+    funcionario_id = SelectField(
+        'Funcionário', coerce=int, validators=[DataRequired()])
+    role = SelectField('Função', choices=[
+                       ('USER', 'Usuário'), ('ADMIN', 'Administrador')], default='USER')
     submit = SubmitField('Registrar')
 
     def __init__(self, *args, **kwargs):
         super(RegisterForm, self).__init__(*args, **kwargs)
         # Preencher o SelectField com todos os funcionários disponíveis no banco de dados
-        self.funcionario_id.choices = [(f.id_func, f.pessoa.nome) for f in Funcionarios.query.all()]
+        self.funcionario_id.choices = [
+            (f.id_func, f.pessoa.nome) for f in Funcionarios.query.all()]
 
         """
         Essa última linha do método cria uma lista de tuplas, onde o primeiro valor é o 
@@ -273,7 +278,21 @@ class RegisterForm(FlaskForm):
 @app.route('/')
 @login_required
 def index():
-    return render_template('index.html', titulo="Página principal")
+    departamentos = db.session.query(
+        Departamentos.nome_departamento,
+        func.count(Funcionarios.id_func).label('total_funcionarios')
+    ).outerjoin(Funcionarios, Funcionarios.fk_id_departamento == Departamentos.id_departamento) \
+     .group_by(Departamentos.id_departamento, Departamentos.nome_departamento).all()
+
+    """
+    O func (que vem do import de sqlalchemy) atua como um proxy que cria objetos 
+    representando chamadas de funções SQL.
+
+    func.count() gera a expressão SQL COUNT().
+    func.sum() gera a expressão SQL SUM().
+    """
+
+    return render_template('index.html', departamentos=departamentos)
 
 
 @app.route('/lista')
@@ -772,20 +791,24 @@ def login():
     form = LoginForm()
 
     if form.validate_on_submit():
-        user = LoginUsuarios.query.filter_by(login_user=form.login_user.data).first()
-        
+        user = LoginUsuarios.query.filter_by(
+            login_user=form.login_user.data).first()
+
         # Verifica se o usuário foi encontrado no banco
-        print(f"Usuário encontrado: {user}")  # Verifica se o usuário foi encontrado
-        print(f"Senha fornecida: {form.senha_hash.data}")  # Verifica a senha fornecida
-        print(f"Senha armazenada: {user.senha_hash}")  # Verifica a senha criptografada no banco
+        # Verifica se o usuário foi encontrado
+        print(f"Usuário encontrado: {user}")
+        # Verifica a senha fornecida
+        print(f"Senha fornecida: {form.senha_hash.data}")
+        # Verifica a senha criptografada no banco
+        print(f"Senha armazenada: {user.senha_hash}")
 
         if user and user.check_password(form.senha_hash.data):
             print("Senha correta!")  # Confirma se a senha está correta
             session['user_id'] = user.id
-            session['role'] = user.role # Armazena o nível de permissão na sessão
+            # Armazena o nível de permissão na sessão
+            session['role'] = user.role
 
             login_user(user)  # Salva o usuário na sessão
-
 
             flash('Login realizado com sucesso!', 'success')
             return redirect(url_for('index'))
@@ -802,15 +825,16 @@ def registrar():
 
     if form.validate_on_submit():
         # Recupera o funcionário já existente pelo ID
-        funcionario = Funcionarios.query.filter_by(id_func=form.funcionario_id.data).first()
+        funcionario = Funcionarios.query.filter_by(
+            id_func=form.funcionario_id.data).first()
 
         if funcionario:
             novo_login = LoginUsuarios(login_user=form.login_user.data)
             novo_login.set_password(form.senha.data)
-            novo_login.fk_id_func = funcionario.id_func  # Associando o login ao funcionário existente
+            # Associando o login ao funcionário existente
+            novo_login.fk_id_func = funcionario.id_func
             novo_login.role = form.role.data  # Definir o role do usuário
 
-            
             db.session.add(novo_login)
             db.session.commit()
 
@@ -820,7 +844,6 @@ def registrar():
         else:
             flash('Funcionário não encontrado.', 'danger')
 
-    
     else:
         print(form.errors)  # Mostra os erros de validação
 
