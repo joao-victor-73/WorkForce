@@ -307,7 +307,8 @@ def lista_de_funcionarios():
     ).outerjoin(Departamentos, Funcionarios.fk_id_departamento == Departamentos.id_departamento).all()
 
     for funcionario, departamento in lista_func:
-        print(f"Funcionário: {funcionario.pessoa.nome}, Departamento: {departamento}, Status {funcionario.status_func}")
+        print(f"Funcionário: {funcionario.pessoa.nome}, Departamento: {
+              departamento}, Status {funcionario.status_func}")
 
     return render_template('lista.html', lista_func=lista_func, titulo="Lista de Funcionários")
 
@@ -785,6 +786,83 @@ def gerar_listaFuncionarios_pdf():
     return response
 
 
+# ROTA PARA LISTAR OS DEPARTAMENTOS DISPONÍVEIS
+@app.route('/listar_departamentos', methods=['POST', 'GET'])
+def listar_departamentos():
+    dados_departamentos = db.session.query(
+        Departamentos.id_departamento,
+        Departamentos.nome_departamento,
+        Pessoas.nome.label('nome')
+    ).outerjoin(Funcionarios, Departamentos.fk_id_func == Funcionarios.id_func) \
+        .outerjoin(Pessoas, Funcionarios.fk_id_pessoa == Pessoas.id_pessoa).all()
+
+    return render_template('departamentos.html', dados_departamentos=dados_departamentos)
+
+
+# ROTA PARA CRIAR / EDITAR UM DEPARTAMENTO
+@app.route('/departamentos/editar/<int:id_obtido>', methods=['GET', 'POST'])
+@app.route('/departamentos/novo', methods=['GET', 'POST'])
+def editar_departamento(id_obtido=None):
+    departamento = None
+    nome_supervisor = None  # Variável para o nome do supervisor
+
+    if id_obtido:
+        departamento_data = db.session.query(
+            Departamentos.id_departamento,
+            Departamentos.nome_departamento,
+            Departamentos.fk_id_func,
+            Pessoas.nome.label('nome')
+        ).outerjoin(Funcionarios, Departamentos.fk_id_func == Funcionarios.id_func) \
+            .outerjoin(Pessoas, Funcionarios.fk_id_pessoa == Pessoas.id_pessoa) \
+            .filter(Departamentos.id_departamento == id_obtido).first()
+
+        # Separar os dados do departamento e o nome do supervisor
+        if departamento_data:
+            departamento = departamento_data._asdict()  # Transformar o Row em um dicionário
+            # Acessar o nome do supervisor diretamente
+            nome_supervisor = departamento_data.nome
+
+    # Carregar lista de funcionários para o dropdown
+    funcionarios = db.session.query(
+        Funcionarios.id_func,
+        Pessoas.nome
+    ).join(Pessoas, Funcionarios.fk_id_pessoa == Pessoas.id_pessoa).all()
+
+    if request.method == 'POST':
+        nome_departamento = request.form.get('nome_departamento').strip()
+        fk_id_func = request.form.get('fk_id_func') or None  # Converte vazio para None
+
+        if departamento:  # Atualizar departamento existente
+            departamento_obj = Departamentos.query.get(id_obtido)
+            departamento_obj.nome_departamento = nome_departamento
+            print("O nome do departamento está salvo")
+            departamento_obj.fk_id_func = fk_id_func
+            print("O id do departamento está salvo (atualizando o supervisor)")
+
+        else:  # Criar um novo departamento
+            novo_departamento = Departamentos(
+                nome_departamento=nome_departamento,
+                fk_id_func=fk_id_func
+            )
+            db.session.add(novo_departamento)
+
+        db.session.commit()
+        flash('Departamento salvo com sucesso!', 'success')
+        return redirect(url_for('listar_departamentos'))
+
+    return render_template('editar_departamento.html', departamento=departamento, funcionarios=funcionarios, nome_supervisor=nome_supervisor)
+
+
+# ROTA PARA EXCLUIR UM DEPARTAMENTO
+@app.route('/departamentos/excluir/<int:id_obtido>', methods=['POST'])
+def excluir_departamento(id_obtido):
+    departamento = Departamentos.query.get(id_obtido)
+    if departamento:
+        db.session.delete(departamento)
+        db.session.commit()
+    return redirect(url_for('listar_departamentos'))
+
+
 # ROTA PARA LOGIN
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -795,7 +873,6 @@ def login():
             login_user=form.login_user.data).first()
 
         # Verifica se o usuário foi encontrado no banco
-        # Verifica se o usuário foi encontrado
         print(f"Usuário encontrado: {user}")
         # Verifica a senha fornecida
         print(f"Senha fornecida: {form.senha_hash.data}")
