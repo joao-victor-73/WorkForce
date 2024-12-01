@@ -167,7 +167,7 @@ class Folha_pagamento(db.Model):
         db.Integer, db.ForeignKey('deducoes_fpg.id_deducao'))
 
     def __repr__(self):
-        return '<Name %r>' % self.name
+        return f'<Folha_pagamento {self.nome_banco}>'
 
 # OBS: o db.Numeric é o equivalente ao Decimal do SQL. Esse é o tipo correspondente no SQLAlchemy.
 
@@ -466,8 +466,10 @@ def criando_funcionario():
         # Recupera a dedução INSS (se ela já existir)
         inss = Deducao.query.filter_by(desc_deducao='INSS').first()
         if not inss:
-            # Caso a dedução INSS não exista, cria ela
-            inss = Deducao(desc_deducao='INSS')
+            # Criar a dedução INSS se ela ainda não existir
+            # Define o valor na tabela Deducoes
+            inss = Deducao(desc_deducao='INSS',
+                           valor_deducao=salario_base * 0.08)
 
         try:
             db.session.add(inss)
@@ -479,13 +481,22 @@ def criando_funcionario():
             flash('Erro ao cadastrar uma nova pessoa.')
             return redirect(url_for('lista_de_funcionarios'))
 
-    # Adiciona a dedução INSS na folha de pagamento
     salario_base_float = float(salario_base)
-    folha_deducao = FolhaDeducoes(fk_id_pagamento=nova_folha_pagamento.id_pagamento,
-                                  fk_id_deducao=inss.id_deducao,
-                                  valor_deducao=salario_base_float * 0.08)  # Exemplo de 8% para INSS
-    db.session.add(folha_deducao)
-    db.session.commit()
+    # Associar a dedução ao pagamento usando FolhaDeducoes
+    folha_deducao = FolhaDeducoes(
+        fk_id_pagamento=nova_folha_pagamento.id_pagamento,
+        fk_id_deducao=inss.id_deducao  # Relaciona com a dedução já criada
+    )
+
+    try:
+        db.session.add(folha_deducao)
+        db.session.commit()
+
+    except Exception as e:
+        db.session.rollback()
+        print("Erro ao adicionar uma nova pessoa:", e)
+        flash('Erro ao cadastrar uma nova pessoa.')
+        return redirect(url_for('lista_de_funcionarios'))
 
     flash('Funcionário cadastrado com sucesso!')
     print("REDIRECIONANDO PARA A LISTA DE FUNCIONÁRIOS")
@@ -512,7 +523,7 @@ def editar_informacoes(id_func):
     folha_pagamento = Folha_pagamento.query.filter_by(
         fk_id_func=id_func).first()
 
-    return render_template("editar.html", titulo="Editar Informações", funcionario=funcionario, pessoa=pessoa, departamentos=departamentos, folha_pagamento=folha_pagamento)
+    return render_template("editar.html", funcionario=funcionario, pessoa=pessoa, departamentos=departamentos, folha_pagamento=folha_pagamento)
 
 
 @app.route('/atualizar_informacoes', methods=['POST',])
@@ -543,10 +554,6 @@ def atualizar_informacoes():
     atualiza_emprego.nome_cargo = request.form['cargo']
     atualiza_emprego.status_func = request.form['status']
 
-    """# Pode ser obtido de um select
-    departamento = Departamentos.query.filter_by(
-        nome_departamento=request.form['departamento']).first()"""
-
     # Atualiza o departamento usando o ID do departamento enviado
     departamento_id = request.form['departamento']
     atualiza_emprego.fk_id_departamento = departamento_id
@@ -554,18 +561,36 @@ def atualizar_informacoes():
     # Atualizar informações salariais
     if 'id_pagamento' in request.form:
         folha_pagamento = Folha_pagamento.query.filter_by(
-            id_folha=request.form['id_pagamento']).first()
-        folha_pagamento.salario_base = request.form['salario_base']
-        # tem que alterar para nome_banco
-        folha_pagamento.nome_banco = request.form['nome_banco']
-        folha_pagamento.num_agencia = request.form['num_agencia']
-        folha_pagamento.conta_deposito = request.form['conta_deposito']
+            id_pagamento=request.form['id_pagamento']).first()
+        print(folha_pagamento)
+
+        if folha_pagamento:
+            folha_pagamento.salario_base = request.form['salario_base']
+            folha_pagamento.data_pagamento = request.form['data_pagamento']
+            folha_pagamento.nome_banco = request.form['nome_banco']
+            folha_pagamento.num_agencia = request.form['num_agencia']
+            folha_pagamento.conta_deposito = request.form['conta_deposito']
+
+        else:
+            # Criar um novo registro de folha de pagamento
+            folha_pagamento = Folha_pagamento(
+                id_pagamento=request.form['id_pagamento'],
+                salario_base=request.form['salario_base'],
+                data_pagamento=request.form['data_pagamento'],
+                nome_banco=request.form['nome_banco'],
+                num_agencia=request.form['num_agencia'],
+                conta_deposito=request.form['conta_deposito']
+            )
         db.session.add(folha_pagamento)
 
     # Salva as alterações no banco de dados
-    db.session.add(atualiza_pessoa)
-    db.session.add(atualiza_emprego)
-    db.session.commit()
+    try:
+        db.session.add(atualiza_pessoa)
+        db.session.add(atualiza_emprego)
+        db.session.commit()
+    except Exception as e:
+        print("Erro ao salvar no banco:", str(e))
+        db.session.rollback()
 
     flash('Funcionário atualizado com sucesso!')
 
@@ -830,7 +855,8 @@ def editar_departamento(id_obtido=None):
 
     if request.method == 'POST':
         nome_departamento = request.form.get('nome_departamento').strip()
-        fk_id_func = request.form.get('fk_id_func') or None  # Converte vazio para None
+        fk_id_func = request.form.get(
+            'fk_id_func') or None  # Converte vazio para None
 
         if departamento:  # Atualizar departamento existente
             departamento_obj = Departamentos.query.get(id_obtido)

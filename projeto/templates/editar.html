@@ -10,6 +10,7 @@
     <form action="{{url_for('atualizar_informacoes')}}" method='POST'>
         <input type="hidden" name="id_pessoa" value="{{ funcionario.fk_id_pessoa }}">
         <input type="hidden" name="id_func" value="{{ funcionario.id_func }}">
+        <input type="hidden" name="id_pagamento" value="{{ folha_pagamento.id_pagamento if folha_pagamento else '' }}">
 
         <div class="informacoes-container">
             <!-- Informações Pessoais -->
@@ -35,6 +36,11 @@
                         <label for="tel2">Número para contato 2:</label>
                         <input type="text" name="tel2" placeholder="Número para contato 2" value="{{ pessoa.tel2 }}">
                     </div>
+                </div>
+
+                <div class="textfield">
+                    <label for="dataNascimento">Data de Nascimento:</label>
+                    <input type="date" name="data_nascimento" value="{{ pessoa.data_nascimento }}">
                 </div>
 
                 <div class="textfield-group">
@@ -133,7 +139,9 @@
 
                     <div class="textfield">
                         <label for="data_pagamento">Data de Pagamento:</label>
-                        <input type="date" name="data_pagamento" value="{{ folha_pagamento.data_pagamento }}">
+                        <select name="data_pagamento">
+                            <option value="Quinto Dia Util" {% if folha_pagamento.data_pagamento == 'Quinto_util' %}selected{% endif %}>5º Dia útil</option>
+                        </select>
                     </div>
 
                     <div class="textfield">
