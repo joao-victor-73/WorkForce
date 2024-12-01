@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, session, flash, url_for, send_file, make_response
 from flask_sqlalchemy import SQLAlchemy  # pip install flask-SQLAlchemy
-from sqlalchemy import func
+from sqlalchemy import func, or_
 
 # Para essas bibliotecas: pip install flask-login flask-wtf flask-bcrypt
 from flask_login import UserMixin, LoginManager, login_user, logout_user, login_required, current_user
@@ -295,22 +295,24 @@ def index():
     return render_template('index.html', departamentos=departamentos)
 
 
-@app.route('/lista')
+@app.route('/lista', methods=['GET', ])
 @login_required
 def lista_de_funcionarios():
-    # lista_func = Funcionarios.query.order_by(Funcionarios.id_func).all()
-
+    termo_busca = request.args.get('busca', '')  # Obtém o termo de busca da URL
+    
     # Consulta para obter todos os funcionários com seus departamentos
-    lista_func = db.session.query(
+    consulta_base = db.session.query(
         Funcionarios,
         Departamentos.nome_departamento
-    ).outerjoin(Departamentos, Funcionarios.fk_id_departamento == Departamentos.id_departamento).all()
+    ).outerjoin(Departamentos, Funcionarios.fk_id_departamento == Departamentos.id_departamento)
 
-    for funcionario, departamento in lista_func:
-        print(f"Funcionário: {funcionario.pessoa.nome}, Departamento: {
-              departamento}, Status {funcionario.status_func}")
+    # Filtra os resultados se houver um termo de busca
+    if termo_busca:
+        consulta_base = consulta_base.filter(Funcionarios.pessoa.has(Pessoas.nome.ilike(f'%{termo_busca}%')))
 
-    return render_template('lista.html', lista_func=lista_func, titulo="Lista de Funcionários")
+    lista_func = consulta_base.all()
+
+    return render_template('lista.html', lista_func=lista_func, busca=termo_busca)
 
 
 @app.route('/cadastro', methods=['POST', ])
