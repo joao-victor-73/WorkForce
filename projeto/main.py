@@ -299,6 +299,9 @@ def index():
 @login_required
 def lista_de_funcionarios():
     termo_busca = request.args.get('busca', '')  # Obtém o termo de busca da URL
+    departamento_filtro = request.args.get('departamento', '')  # Filtro por departamento
+    data_contratacao_filtro = request.args.get('data_contratacao', '')  # Filtro por data de contratação
+    
     
     # Consulta para obter todos os funcionários com seus departamentos
     consulta_base = db.session.query(
@@ -306,13 +309,29 @@ def lista_de_funcionarios():
         Departamentos.nome_departamento
     ).outerjoin(Departamentos, Funcionarios.fk_id_departamento == Departamentos.id_departamento)
 
-    # Filtra os resultados se houver um termo de busca
+    # Filtra os resultados se houver um termo de busca e também é como um filtro pelo nome
     if termo_busca:
-        consulta_base = consulta_base.filter(Funcionarios.pessoa.has(Pessoas.nome.ilike(f'%{termo_busca}%')))
+        consulta_base = consulta_base.filter(
+            Funcionarios.pessoa.has(Pessoas.nome.ilike(f'%{termo_busca}%'))
+        )
+
+    # Filtro por departamento
+    if departamento_filtro:
+        consulta_base = consulta_base.filter(
+            Departamentos.nome_departamento.ilike(f'%{departamento_filtro}%')
+        )
+    
+    # Filtro por data de contratação
+    if data_contratacao_filtro:
+        try:
+            data_filtro = datetime.strptime(data_contratacao_filtro, '%Y-%m-%d')
+            consulta_base = consulta_base.filter(Funcionarios.data_contratacao == data_filtro)
+        except ValueError:
+            flash("Formato de data inválido. Use 'AAAA-MM-DD'.", "error")
 
     lista_func = consulta_base.all()
 
-    return render_template('lista.html', lista_func=lista_func, busca=termo_busca)
+    return render_template('lista.html', lista_func=lista_func, busca=termo_busca, departamento=departamento_filtro, data_contratacao=data_contratacao_filtro)
 
 
 @app.route('/cadastro', methods=['POST', ])
