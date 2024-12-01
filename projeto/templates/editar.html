@@ -3,170 +3,203 @@
 {% block conteudo %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/Editar.css') }}">
 <div class="all">
-<section class="informacoes">
-    <header>
-        <h2>Informações Pessoais</h2>
-    </header>
-    <form action="{{url_for('atualizar_informacoes')}}" method='POST'>
-        <input type="hidden" name="id_pessoa" value="{{ funcionario.fk_id_pessoa }}">
-        <input type="hidden" name="id_func" value="{{ funcionario.id_func }}">
-        <input type="hidden" name="id_pagamento" value="{{ folha_pagamento.id_pagamento if folha_pagamento else '' }}">
+    <section class="informacoes">
+        <header>
+            <h2>Informações Pessoais</h2>
+        </header>
+        <form action="{{url_for('atualizar_informacoes')}}" method='POST'>
+            <input type="hidden" name="id_pessoa" value="{{ funcionario.fk_id_pessoa }}">
+            <input type="hidden" name="id_func" value="{{ funcionario.id_func }}">
+            <input type="hidden" name="id_pagamento" value="{{ folha_pagamento.id_pagamento if folha_pagamento else '' }}">
 
-        <div class="informacoes-container">
-            <!-- Informações Pessoais -->
-            <fieldset class="dados-pessoais">
-                <legend>Dados Pessoais</legend>
-                <div class="textfield-group">
-                    <div class="textfield">
-                        <label for="nomeCompleto">Nome Completo:</label>
-                        <input type="text" name="nome" placeholder="Nome Completo" value="{{ pessoa.nome }}" required>
+            <div class="informacoes-container">
+                <!-- Informações Pessoais -->
+                <fieldset class="dados-pessoais">
+                    <legend>Dados Pessoais</legend>
+                    <div class="textfield-group">
+                        <div class="textfield">
+                            <label for="nomeCompleto">Nome Completo:</label>
+                            <input type="text" name="nome" placeholder="Nome Completo" value="{{ pessoa.nome }}" required>
+                        </div>
+                        <div class="textfield">
+                            <label for="cpf">CPF:</label>
+                            <input type="text" name="cpf" placeholder="CPF" value="{{ pessoa.cpf }}" required>
+                        </div>
                     </div>
-                    <div class="textfield">
-                        <label for="cpf">CPF:</label>
-                        <input type="text" name="cpf" placeholder="CPF" value="{{ pessoa.cpf }}" required>
-                    </div>
-                </div>
 
-                <div class="textfield-group">
-                    <div class="textfield">
-                        <label for="tel1">Número para contato 1:</label>
-                        <input type="text" name="tel1" placeholder="Número para contato 1" value="{{ pessoa.tel1 }}">
-                    </div>
-                    <div class="textfield">
-                        <label for="tel2">Número para contato 2:</label>
-                        <input type="text" name="tel2" placeholder="Número para contato 2" value="{{ pessoa.tel2 }}">
-                    </div>
-                </div>
-
-                <div class="textfield">
-                    <label for="dataNascimento">Data de Nascimento:</label>
-                    <input type="date" name="data_nascimento" value="{{ pessoa.data_nascimento }}">
-                </div>
-
-                <div class="textfield-group">
-                    <div class="textfield">
-                        <label for="rua">Rua:</label>
-                        <input type="text" name="rua" placeholder="Rua" value="{{ pessoa.rua }}">
-                    </div>
-                    <div class="textfield">
-                        <label for="bairro">Bairro:</label>
-                        <input type="text" name="bairro" placeholder="Bairro" value="{{ pessoa.bairro }}">
-                    </div>
-                </div>
-
-                <div class="textfield-group">
-                    <div class="textfield">
-                        <label for="num_residencia">Número da Residência:</label>
-                        <input type="text" name="num_residencia" placeholder="Número da Residência" value="{{ pessoa.num_residencia }}">
-                    </div>
-                    <div class="textfield">
-                        <label for="cidade">Cidade:</label>
-                        <input type="text" name="cidade" placeholder="Cidade" value="{{ pessoa.cidade }}">
-                    </div>
-                </div>
-
-                <div class="textfield-group">
-                    <div class="textfield">
-                        <label for="cep">CEP:</label>
-                        <input type="text" name="cep" placeholder="CEP" value="{{ pessoa.cep }}">
-                    </div>
-                </div>
-            </fieldset>
-
-            <!-- Informações do Emprego -->
-            <fieldset class="informacoes-emprego">
-                <legend>Informações do Emprego</legend>
-                <div class="textfield">
-                    <label for="email">E-mail:</label>
-                    <input type="email" name="email" placeholder="E-mail" value="{{ funcionario.email }}">
-                </div>
-
-                <div class="textfield">
-                    <label for="data_contratacao">Data de Contratação:</label>
-                    <input type="date" name="data_contratacao" value="{{ funcionario.data_contratacao }}" required>
-                </div>
-
-                <div class="textfield">
-                    <label for="cargo">Cargo:</label>
-                    <input type="text" name="cargo" placeholder="Cargo" value="{{ funcionario.nome_cargo }}" required>
-                </div>
-
-                <div class="textfield">
-                    <label for="departamento">Departamento:</label>
-                    <select name="departamento" required>
-                        {% for departamento in departamentos %}
-                            <option value="{{ departamento.id_departamento }}" {% if departamento.id_departamento == funcionario.fk_id_departamento %}selected{% endif %}>
-                                {{ departamento.nome_departamento }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="textfield">
-                    <label for="status">Status:</label>
-                    <select name="status" required>
-                        <option value="EFETIVO" {% if funcionario.status_func == 'EFETIVO' %}selected{% endif %}>Efetivo</option>
-                        <option value="FERIAS" {% if funcionario.status_func == 'FERIAS' %}selected{% endif %}>Férias</option>
-                        <option value="DEMITIDO" {% if funcionario.status_func == 'DEMITIDO' %}selected{% endif %}>Demitido</option>
-                        <option value="ATESTADO" {% if funcionario.status_func == 'ATESTADO' %}selected{% endif %}>Atestado</option>
-                    </select>
-                </div>
-            </fieldset>
-
-            <!-- Informações Salariais -->
-            <fieldset class="informacoes-salariais">
-                <legend>Informações Salariais</legend>
-                {% if folha_pagamento %}
-                    <div class="textfield">
-                        <label for="nome_banco">Nome do Banco:</label>
-                        <input type="text" name="nome_banco" value="{{ folha_pagamento.nome_banco }}" required>
+                    <div class="textfield-group">
+                        <div class="textfield">
+                            <label for="tel1">Número para contato 1:</label>
+                            <input type="text" name="tel1" placeholder="Número para contato 1" value="{{ pessoa.tel1 }}">
+                        </div>
+                        <div class="textfield">
+                            <label for="tel2">Número para contato 2:</label>
+                            <input type="text" name="tel2" placeholder="Número para contato 2" value="{{ pessoa.tel2 }}">
+                        </div>
                     </div>
 
                     <div class="textfield">
-                        <label for="num_agencia">Número da agência:</label>
-                        <input type="text" name="num_agencia" value="{{ folha_pagamento.num_agencia }}" required>
+                        <label for="dataNascimento">Data de Nascimento:</label>
+                        <input type="date" name="data_nascimento" value="{{ pessoa.data_nascimento }}">
+                    </div>
+
+                    <div class="textfield-group">
+                        <div class="textfield">
+                            <label for="rua">Rua:</label>
+                            <input type="text" name="rua" placeholder="Rua" value="{{ pessoa.rua }}">
+                        </div>
+                        <div class="textfield">
+                            <label for="bairro">Bairro:</label>
+                            <input type="text" name="bairro" placeholder="Bairro" value="{{ pessoa.bairro }}">
+                        </div>
+                    </div>
+
+                    <div class="textfield-group">
+                        <div class="textfield">
+                            <label for="num_residencia">Número da Residência:</label>
+                            <input type="text" name="num_residencia" placeholder="Número da Residência" value="{{ pessoa.num_residencia }}">
+                        </div>
+                        <div class="textfield">
+                            <label for="cidade">Cidade:</label>
+                            <input type="text" name="cidade" placeholder="Cidade" value="{{ pessoa.cidade }}">
+                        </div>
+                    </div>
+
+                    <div class="textfield-group">
+                        <div class="textfield">
+                            <label for="cep">CEP:</label>
+                            <input type="text" name="cep" placeholder="CEP" value="{{ pessoa.cep }}">
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Informações do Emprego -->
+                <fieldset class="informacoes-emprego">
+                    <legend>Informações do Emprego</legend>
+                    <div class="textfield">
+                        <label for="email">E-mail:</label>
+                        <input type="email" name="email" placeholder="E-mail" value="{{ funcionario.email }}">
                     </div>
 
                     <div class="textfield">
-                        <label for="conta_deposito">Conta de depósito:</label>
-                        <input type="text" name="conta_deposito" value="{{ folha_pagamento.conta_deposito }}" required>
+                        <label for="data_contratacao">Data de Contratação:</label>
+                        <input type="date" name="data_contratacao" value="{{ funcionario.data_contratacao }}" required>
                     </div>
 
                     <div class="textfield">
-                        <label for="salario_base">Salário Base:</label>
-                        <input type="number" id="salario_base" name="salario_base" placeholder="Digite o salário" step="0.01" min="0" value="{{ folha_pagamento.salario_base }}" required>
+                        <label for="cargo">Cargo:</label>
+                        <input type="text" name="cargo" placeholder="Cargo" value="{{ funcionario.nome_cargo }}" required>
                     </div>
 
                     <div class="textfield">
-                        <label for="data_pagamento">Data de Pagamento:</label>
-                        <select name="data_pagamento">
-                            <option value="Quinto Dia Util" {% if folha_pagamento.data_pagamento == 'Quinto_util' %}selected{% endif %}>5º Dia útil</option>
+                        <label for="departamento">Departamento:</label>
+                        <select name="departamento" required>
+                            {% for departamento in departamentos %}
+                                <option value="{{ departamento.id_departamento }}" {% if departamento.id_departamento == funcionario.fk_id_departamento %}selected{% endif %}>
+                                    {{ departamento.nome_departamento }}
+                                </option>
+                            {% endfor %}
                         </select>
                     </div>
 
                     <div class="textfield">
-                        <label for="tipo_contratacao">Tipo:</label>
-                        <select name="tipo_contratacao">
-                            <option value="HORISTA" {% if folha_pagamento.tipo == 'HORISTA' %}selected{% endif %}>Horista</option>
-                            <option value="FOLGUISTA" {% if folha_pagamento.tipo == 'FOLGUISTA' %}selected{% endif %}>Folguista</option>
-                            <option value="INTERMITENTE" {% if folha_pagamento.tipo == 'INTERMITENTE' %}selected{% endif %}>Intermitente</option>
-                            <option value="MENSALISTA" {% if folha_pagamento.tipo == 'MENSALISTA' %}selected{% endif %}>Mensalista</option>
-                            <option value="PJ" {% if folha_pagamento.tipo == 'PJ' %}selected{% endif %}>PJ</option>
+                        <label for="status">Status:</label>
+                        <select name="status" required>
+                            <option value="EFETIVO" {% if funcionario.status_func == 'EFETIVO' %}selected{% endif %}>Efetivo</option>
+                            <option value="FERIAS" {% if funcionario.status_func == 'FERIAS' %}selected{% endif %}>Férias</option>
+                            <option value="DEMITIDO" {% if funcionario.status_func == 'DEMITIDO' %}selected{% endif %}>Demitido</option>
+                            <option value="ATESTADO" {% if funcionario.status_func == 'ATESTADO' %}selected{% endif %}>Atestado</option>
                         </select>
                     </div>
-                {% else %}
-                    <p>Esse funcionário não possui uma folha de pagamento cadastrada.</p>
-                {% endif %}
-            </fieldset>
-        </div>
+                </fieldset>
 
-       <!-- Botões de Ação -->
-<div class="actions">
-    <button type="submit" class="form-button">Salvar Informações</button>
-    <a href="{{ url_for('lista_de_funcionarios') }}" class="back-button">Voltar</a>
+                <!-- Informações Salariais -->
+                <fieldset class="informacoes-salariais">
+                    <legend>Informações Salariais</legend>
+                    {% if folha_pagamento %}
+                        <div class="textfield">
+                            <label for="nome_banco">Nome do Banco:</label>
+                            <input type="text" name="nome_banco" value="{{ folha_pagamento.nome_banco }}" required>
+                        </div>
+
+                        <div class="textfield">
+                            <label for="num_agencia">Número da agência:</label>
+                            <input type="text" name="num_agencia" value="{{ folha_pagamento.num_agencia }}" required>
+                        </div>
+
+                        <div class="textfield">
+                            <label for="conta_deposito">Conta de depósito:</label>
+                            <input type="text" name="conta_deposito" value="{{ folha_pagamento.conta_deposito }}" required>
+                        </div>
+
+                        <div class="textfield">
+                            <label for="salario_base">Salário Base:</label>
+                            <input type="number" id="salario_base" name="salario_base" placeholder="Digite o salário" step="0.01" min="0" value="{{ folha_pagamento.salario_base }}" required>
+                        </div>
+
+                        <div class="textfield">
+                            <label for="data_pagamento">Data de Pagamento:</label>
+                            <select name="data_pagamento">
+                                <option value="Quinto Dia Util" {% if folha_pagamento.data_pagamento == 'Quinto_util' %}selected{% endif %}>5º Dia útil</option>
+                            </select>
+                        </div>
+
+                        <div class="textfield">
+                            <label for="tipo_contratacao">Tipo:</label>
+                            <select name="tipo_contratacao">
+                                <option value="HORISTA" {% if folha_pagamento.tipo == 'HORISTA' %}selected{% endif %}>Horista</option>
+                                <option value="FOLGUISTA" {% if folha_pagamento.tipo == 'FOLGUISTA' %}selected{% endif %}>Folguista</option>
+                                <option value="INTERMITENTE" {% if folha_pagamento.tipo == 'INTERMITENTE' %}selected{% endif %}>Intermitente</option>
+                                <option value="MENSALISTA" {% if folha_pagamento.tipo == 'MENSALISTA' %}selected{% endif %}>Mensalista</option>
+                                <option value="PJ" {% if folha_pagamento.tipo == 'PJ' %}selected{% endif %}>PJ</option>
+                            </select>
+                        </div>
+                    {% else %}
+                        <p>Esse funcionário não possui uma folha de pagamento cadastrada.</p>
+                    {% endif %}
+                </fieldset>
+            </div>
+
+                <!-- Botões de Ação -->
+            <div class="actions">
+                <button type="submit" class="form-button">Salvar Informações</button>
+                <a href="{{ url_for('lista_de_funcionarios') }}" class="back-button">Voltar</a>
+            </div>
+        </form>
+    </section>
 </div>
 
-    </form>
-</section>
-</div>
+<script>
+    // Validação para o campo de salário base
+    document.getElementById('salario_base').addEventListener('input', function (event) {
+        var valor = event.target.value;
+        if (valor < 0) {
+            alert("O salário não pode ser negativo.");
+            event.target.value = 0;
+        }
+    });
+
+    // O usuário digitará o CPF e automaticamente será adicionado os pontos e traços
+    const cpfInput = document.getElementById("cpf");
+
+    cpfInput.addEventListener("input", function() {
+        // Remove todos os caracteres que não são números
+        let cpf = cpfInput.value.replace(/\D/g, "");
+
+        // Limita o CPF a 11 dígitos
+        cpf = cpf.substring(0, 11);
+
+        // Adiciona a formatação (XXX.XXX.XXX-XX)
+        if (cpf.length > 9) {
+            cpf = cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+        } else if (cpf.length > 6) {
+            cpf = cpf.replace(/(\d{3})(\d{3})(\d{1,3})/, "$1.$2.$3");
+        } else if (cpf.length > 3) {
+            cpf = cpf.replace(/(\d{3})(\d{1,3})/, "$1.$2");
+        }
+
+        // Atualiza o valor do campo
+        cpfInput.value = cpf;
+    });
+</script>
 {% endblock %}
