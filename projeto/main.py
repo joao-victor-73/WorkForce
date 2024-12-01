@@ -300,8 +300,12 @@ def index():
 def lista_de_funcionarios():
     termo_busca = request.args.get('busca', '')  # Obtém o termo de busca da URL
     departamento_filtro = request.args.get('departamento', '')  # Filtro por departamento
-    data_contratacao_filtro = request.args.get('data_contratacao', '')  # Filtro por data de contratação
     
+    # Filtro por data de contratação (Intervalo (de uma data até outra) )
+    data_contratacao_inicio = request.args.get('data_contratacao_inicio', '') 
+    data_contratacao_fim = request.args.get('data_contratacao_fim', '')
+
+    status_filtro = request.args.get('status', '') # Filtro para o status do funcionario
     
     # Consulta para obter todos os funcionários com seus departamentos
     consulta_base = db.session.query(
@@ -321,17 +325,30 @@ def lista_de_funcionarios():
             Departamentos.nome_departamento.ilike(f'%{departamento_filtro}%')
         )
     
-    # Filtro por data de contratação
-    if data_contratacao_filtro:
+    # Filtro por data de contratação (intervalo)
+    if data_contratacao_inicio and data_contratacao_fim:
         try:
-            data_filtro = datetime.strptime(data_contratacao_filtro, '%Y-%m-%d')
-            consulta_base = consulta_base.filter(Funcionarios.data_contratacao == data_filtro)
+            data_inicio = datetime.strptime(data_contratacao_inicio, '%Y-%m-%d')
+            data_fim = datetime.strptime(data_contratacao_fim, '%Y-%m-%d')
+            consulta_base = consulta_base.filter(Funcionarios.data_contratacao.between(data_inicio, data_fim))
         except ValueError:
             flash("Formato de data inválido. Use 'AAAA-MM-DD'.", "error")
+    
+    # Filtro por status
+    if status_filtro:
+        consulta_base = consulta_base.filter(Funcionarios.status_func.ilike(f'%{status_filtro}%'))
 
     lista_func = consulta_base.all()
 
-    return render_template('lista.html', lista_func=lista_func, busca=termo_busca, departamento=departamento_filtro, data_contratacao=data_contratacao_filtro)
+    return render_template(
+        'lista.html', 
+        lista_func=lista_func, 
+        busca=termo_busca, 
+        departamento=departamento_filtro, 
+        data_contratacao_inicio=data_contratacao_inicio,
+        data_contratacao_fim=data_contratacao_fim,
+        status=status_filtro
+        )
 
 
 @app.route('/cadastro', methods=['POST', ])

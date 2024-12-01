@@ -13,10 +13,27 @@
 
     <div>
         <form method="get" action="{{ url_for('lista_de_funcionarios') }}">
-            <input type="text" name="busca" placeholder="Buscar funcionários" value="{{ busca }}">
+            <input type="text" name="busca" placeholder="Buscar por nome" value="{{ busca }}">
+
             <input type="text" name="departamento" placeholder="Filtrar por departamento" value="{{ departamento }}">
-            <input type="text" name="data_contratacao" placeholder="Filtrar por data de contratação (AAAA-MM-DD)" value="{{ data_contratacao }}">
+        
+            <label>Data de Contratação (De):</label>
+            <input type="date" name="data_contratacao_inicio" value="{{ data_contratacao_inicio }}">
+        
+            <label>Data de Contratação (Até):</label>
+            <input type="date" name="data_contratacao_fim" value="{{ data_contratacao_fim }}">
+        
+            <label>Status:</label>
+            <select name="status">
+                <option value="">Selecione Status</option>
+                <option value="EFETIVO" {% if status == 'EFETIVO' %}selected{% endif %}>EFETIVO</option>
+                <option value="DEMITIDO" {% if status == 'DEMITIDO' %}selected{% endif %}>DEMITIDO</option>
+                <option value="FERIAS" {% if status == 'FERIAS' %}selected{% endif %}>FERIAS</option>
+                <option value="ATESTADO" {% if status == 'ATESTADO' %}selected{% endif %}>ATESTADO</option>
+            </select>
+        
             <button type="submit">Pesquisar</button>
+            <a href="{{ url_for('lista_de_funcionarios') }}" class="btn">Limpar Filtros</a>
         </form>
     </div>
 
