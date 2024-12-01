@@ -21,19 +21,19 @@
 
                     <div class="textfield">
                         <label for="cpf">CPF:</label>
-                        <input type="text" name="cpf" maxlength="14" placeholder="___ . ___ . ___ - __" required>
+                        <input type="number" id="cpf" name="cpf" maxlength="14" placeholder="___ . ___ . ___ - __" required>
                     </div>
                 </div>
 
                 <div class="textfield-group">
                     <div class="textfield">
                         <label for="tel1">Número para contato 1:</label>
-                        <input type="text" name="tel1" placeholder="Número para contato 1">
+                        <input type="text" id="tel1" name="tel1" maxlegth="15" placeholder="(**)*-****-****" pattern="\d*" title="Somente números">
                     </div>
 
                     <div class="textfield">
                         <label for="tel2">Número para contato 2:</label>
-                        <input type="text" name="tel2" placeholder="Número para contato 2">
+                        <input type="text" id="tel2" name="tel2" maxlegth="15" placeholder="(**)*-****-****" pattern="\d*" title="Somente números">
                     </div>
                 </div>
 
@@ -57,7 +57,7 @@
                 <div class="textfield-group">
                     <div class="textfield">
                         <label for="num_residencia">Número da Residência:</label>
-                        <input type="text" name="num_residencia" placeholder="Número da Residência">
+                        <input type="text" name="num_residencia" placeholder="**">
                     </div>
 
                     <div class="textfield">
@@ -68,7 +68,7 @@
 
                 <div class="textfield">
                     <label for="cep">CEP:</label>
-                    <input type="text" name="cep" placeholder="CEP">
+                    <input type="text" id="cep" name="cep" placeholder="CEP">
                 </div>
             </div>
 
@@ -120,13 +120,13 @@
                 </div>
 
                 <div class="textfield">
-                    <label for="num_agencia">Número da agência:</label>
-                    <input type="text" name="num_agencia" required>
+                    <label for="num_agencia">Número da agência(Com DV):</label>
+                    <input type="text" id="agencia" name="num_agencia" maxlegth="6" placeholder="****-*" pattern="\d*" title="Somente números" required>
                 </div>
 
                 <div class="textfield">
                     <label for="conta_deposito">Conta de depósito:</label>
-                    <input type="text" name="conta_deposito" required>
+                    <input type="text" id="conta_deposito" name="conta_deposito" pattern="\d*" title="Somente números" required>
                 </div>
 
                 <div class="textfield">
@@ -192,6 +192,17 @@
 
         // Atualiza o valor do campo
         cpfInput.value = cpf;
+    });
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.8/jquery.inputmask.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $("#cep").inputmask("99999-999"); // Máscara para CEP
+        $("#agencia").inputmask("9999-9"); // Máscara para número de agência
+        $("#tel1").inputmask("(99)9.9999-9999"); // Máscara para número de contato 1
+        $("#tel2").inputmask("(99)9.9999-9999"); // Máscara para número de contato 2
     });
 </script>
 

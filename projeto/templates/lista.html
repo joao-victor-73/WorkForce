@@ -36,7 +36,7 @@
                         <td>
                             <div class="acoes">
                                 <a href="{{ url_for('editar_informacoes', id_func=funcionario.id_func) }}" class="acao-link">Editar</a>
-                                <a href="{{ url_for('deletar_informacoes', id_func=funcionario.id_func) }}" class="acao-link">Deletar</a>
+                                <a href="{{ url_for('deletar_informacoes', id_func=funcionario.id_func) }}" onclick="return confirm('Tem certeza que deseja excluir?');" class="acao-link">Deletar</a>
                             </div>                                              
                         </td>
                     </tr>

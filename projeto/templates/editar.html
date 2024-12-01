@@ -23,18 +23,18 @@
                         </div>
                         <div class="textfield">
                             <label for="cpf">CPF:</label>
-                            <input type="text" name="cpf" placeholder="CPF" value="{{ pessoa.cpf }}" required>
+                            <input type="text" id="cpf" name="cpf" id="cpf" placeholder="CPF" value="{{ pessoa.cpf }}" required>
                         </div>
                     </div>
 
                     <div class="textfield-group">
                         <div class="textfield">
                             <label for="tel1">Número para contato 1:</label>
-                            <input type="text" name="tel1" placeholder="Número para contato 1" value="{{ pessoa.tel1 }}">
+                            <input type="text" name="tel1" value="{{ pessoa.tel1 }}" maxlegth="15" placeholder="(**)*-****-****" pattern="\d*" title="Somente números">
                         </div>
                         <div class="textfield">
                             <label for="tel2">Número para contato 2:</label>
-                            <input type="text" name="tel2" placeholder="Número para contato 2" value="{{ pessoa.tel2 }}">
+                            <input type="text" name="tel2" placeholder="Número para contato 2" value="{{ pessoa.tel2 }}" maxlegth="15" placeholder="(**)*-****-****" pattern="\d*" title="Somente números" >
                         </div>
                     </div>
 
@@ -57,7 +57,7 @@
                     <div class="textfield-group">
                         <div class="textfield">
                             <label for="num_residencia">Número da Residência:</label>
-                            <input type="text" name="num_residencia" placeholder="Número da Residência" value="{{ pessoa.num_residencia }}">
+                            <input type="text" name="num_residencia" value="{{ pessoa.num_residencia }}">
                         </div>
                         <div class="textfield">
                             <label for="cidade">Cidade:</label>
@@ -68,7 +68,7 @@
                     <div class="textfield-group">
                         <div class="textfield">
                             <label for="cep">CEP:</label>
-                            <input type="text" name="cep" placeholder="CEP" value="{{ pessoa.cep }}">
+                            <input type="text" id="cep" name="cep" placeholder="CEP" value="{{ pessoa.cep }}">
                         </div>
                     </div>
                 </fieldset>
@@ -123,13 +123,13 @@
                         </div>
 
                         <div class="textfield">
-                            <label for="num_agencia">Número da agência:</label>
-                            <input type="text" name="num_agencia" value="{{ folha_pagamento.num_agencia }}" required>
+                            <label for="num_agencia">Número da agência(Com DV):</label>
+                            <input type="text" id="agencia" name="num_agencia" value="{{ folha_pagamento.num_agencia }}" maxlegth="6" placeholder="****-*" pattern="\d*" title="Somente números" required>
                         </div>
-
+        
                         <div class="textfield">
                             <label for="conta_deposito">Conta de depósito:</label>
-                            <input type="text" name="conta_deposito" value="{{ folha_pagamento.conta_deposito }}" required>
+                            <input type="text" id="conta_deposito" name="conta_deposito" value="{{ folha_pagamento.conta_deposito }}" pattern="\d*" title="Somente números" required>
                         </div>
 
                         <div class="textfield">
@@ -200,6 +200,17 @@
 
         // Atualiza o valor do campo
         cpfInput.value = cpf;
+    });
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.8/jquery.inputmask.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $("#cep").inputmask("99999-999"); // Máscara para CEP
+        $("#agencia").inputmask("9999-9"); // Máscara para número de agência
+        $("#tel1").inputmask("(99)9.9999-9999"); // Máscara para número de contato 1
+        $("#tel2").inputmask("(99)9.9999-9999"); // Máscara para número de contato 2
     });
 </script>
 {% endblock %}
