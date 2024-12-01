@@ -15,8 +15,16 @@
         <form method="get" action="{{ url_for('lista_de_funcionarios') }}">
             <input type="text" name="busca" placeholder="Buscar por nome" value="{{ busca }}">
 
-            <input type="text" name="departamento" placeholder="Filtrar por departamento" value="{{ departamento }}">
-        
+            <label>Departamento:</label>
+            <select name="departamento">
+                <option value="">Todos os Departamentos</option>
+                {% for departamento in lista_de_departamentos %}
+                <option value="{{ departamento[0] }}" {% if departamento_filtro == departamento[0] %}selected{% endif %}>
+                    {{ departamento[0] }}
+                </option>
+                {% endfor %}
+            </select>
+
             <label>Data de Contratação (De):</label>
             <input type="date" name="data_contratacao_inicio" value="{{ data_contratacao_inicio }}">
         

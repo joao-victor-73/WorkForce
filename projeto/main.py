@@ -322,7 +322,7 @@ def lista_de_funcionarios():
     # Filtro por departamento
     if departamento_filtro:
         consulta_base = consulta_base.filter(
-            Departamentos.nome_departamento.ilike(f'%{departamento_filtro}%')
+            Departamentos.nome_departamento == departamento_filtro
         )
     
     # Filtro por data de contratação (intervalo)
@@ -338,11 +338,15 @@ def lista_de_funcionarios():
     if status_filtro:
         consulta_base = consulta_base.filter(Funcionarios.status_func.ilike(f'%{status_filtro}%'))
 
+    # Obter todos os departamentos
+    lista_de_departamentos = db.session.query(Departamentos.nome_departamento).all()
+
     lista_func = consulta_base.all()
 
     return render_template(
         'lista.html', 
         lista_func=lista_func, 
+        lista_de_departamentos=lista_de_departamentos,
         busca=termo_busca, 
         departamento=departamento_filtro, 
         data_contratacao_inicio=data_contratacao_inicio,
