@@ -258,9 +258,15 @@ INNER JOIN Pessoas p
 ON f.fk_id_pessoa = p.id_pessoa
 	INNER JOIN departamentos d
     ON f.fk_id_departamento = d.id_departamento
-WHERE f.id_func = 6;
+WHERE f.id_func = 7;
 
 
 SELECT id_departamento, nome_departamento, fk_id_func
 FROM Departamentos
 WHERE id_departamento BETWEEN 1 AND 10;
+
+
+SELECT * from folha_pagamento
+where fk_id_func = 7;
+
+SELECT * FROM funcionarios;
