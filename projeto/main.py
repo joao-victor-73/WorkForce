@@ -299,15 +299,18 @@ def index():
 @app.route('/lista', methods=['GET', ])
 @login_required
 def lista_de_funcionarios():
-    termo_busca = request.args.get('busca', '')  # Obtém o termo de busca da URL
-    departamento_filtro = request.args.get('departamento', '')  # Filtro por departamento
-    
+    # Obtém o termo de busca da URL
+    termo_busca = request.args.get('busca', '')
+    departamento_filtro = request.args.get(
+        'departamento', '')  # Filtro por departamento
+
     # Filtro por data de contratação (Intervalo (de uma data até outra) )
-    data_contratacao_inicio = request.args.get('data_contratacao_inicio', '') 
+    data_contratacao_inicio = request.args.get('data_contratacao_inicio', '')
     data_contratacao_fim = request.args.get('data_contratacao_fim', '')
 
-    status_filtro = request.args.get('status', '') # Filtro para o status do funcionario
-    
+    # Filtro para o status do funcionario
+    status_filtro = request.args.get('status', '')
+
     # Consulta para obter todos os funcionários com seus departamentos
     consulta_base = db.session.query(
         Funcionarios,
@@ -325,35 +328,39 @@ def lista_de_funcionarios():
         consulta_base = consulta_base.filter(
             Departamentos.nome_departamento == departamento_filtro
         )
-    
+
     # Filtro por data de contratação (intervalo)
     if data_contratacao_inicio and data_contratacao_fim:
         try:
-            data_inicio = datetime.strptime(data_contratacao_inicio, '%Y-%m-%d')
+            data_inicio = datetime.strptime(
+                data_contratacao_inicio, '%Y-%m-%d')
             data_fim = datetime.strptime(data_contratacao_fim, '%Y-%m-%d')
-            consulta_base = consulta_base.filter(Funcionarios.data_contratacao.between(data_inicio, data_fim))
+            consulta_base = consulta_base.filter(
+                Funcionarios.data_contratacao.between(data_inicio, data_fim))
         except ValueError:
             flash("Formato de data inválido. Use 'AAAA-MM-DD'.", "error")
-    
+
     # Filtro por status
     if status_filtro:
-        consulta_base = consulta_base.filter(Funcionarios.status_func.ilike(f'%{status_filtro}%'))
+        consulta_base = consulta_base.filter(
+            Funcionarios.status_func.ilike(f'%{status_filtro}%'))
 
     # Obter todos os departamentos
-    lista_de_departamentos = db.session.query(Departamentos.nome_departamento).all()
+    lista_de_departamentos = db.session.query(
+        Departamentos.nome_departamento).all()
 
     lista_func = consulta_base.all()
 
     return render_template(
-        'lista.html', 
-        lista_func=lista_func, 
+        'lista.html',
+        lista_func=lista_func,
         lista_de_departamentos=lista_de_departamentos,
-        busca=termo_busca, 
-        departamento=departamento_filtro, 
+        busca=termo_busca,
+        departamento=departamento_filtro,
         data_contratacao_inicio=data_contratacao_inicio,
         data_contratacao_fim=data_contratacao_fim,
         status=status_filtro
-        )
+    )
 
 
 @app.route('/cadastro', methods=['POST', ])
@@ -659,18 +666,14 @@ def deletar_informacoes(id_func):
     funcionario = Funcionarios.query.get_or_404(id_func)
 
     try:
-
-        if funcionario:
-            funcionario.status_informacao = False
-            db.session.commit()
-
-        """# Recupera e exclui o funcionário e suas informações associadas
+        # Recupera e exclui o funcionário e suas informações associadas
         pessoa = Pessoas.query.get(funcionario.fk_id_pessoa)
         db.session.delete(funcionario)
+        db.session.commit()
 
         # Exclui também o registro pessoal associado
         db.session.delete(pessoa)
-        db.session.commit()"""
+        db.session.commit()
 
         flash("Funcionário e informações associadas excluídos com sucesso.", "success")
     except Exception as e:
