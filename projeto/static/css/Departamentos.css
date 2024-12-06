@@ -1,0 +1,87 @@
+/* Estilo para a página de departamentos */
+.Bloco1 {
+    margin-left: 180px;
+}
+
+h1 {
+    color: #191970; 
+    margin-left: 0px;
+    margin-top: 20px;
+}
+
+a {
+    color: #0056b3;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+    color: rgb(104, 137, 255);
+}
+
+/* Estilo do botão no formulário */
+.buttondepart {
+    background-color: #f97316;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    background-color: #d65e10;
+}
+
+/* Estilo da tabela */
+table {
+    width: 300%;
+    margin: 10px auto;
+    border-collapse: collapse;
+    background-color: white;
+    color: #191970; /* Azul escuro */
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+table th, table td {
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #f97316; /* Laranja */
+    color: white;
+    font-size: 1rem;
+}
+
+td {
+    border-top: 1px solid #ddd;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+tr:hover {
+    background-color: #f9e4d7; /* Tom claro de laranja */
+}
+
+/* Link para novo departamento */
+a[href*="editar_departamento"] {
+    display: block;
+    width: fit-content;
+    margin: 10px auto 20px;
+    padding: 10px 20px;
+    background-color: #f97316;
+    color: white;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 1rem;
+}
+
+a[href*="editar_departamento"]:hover {
+    background-color: #d65e10;
+}

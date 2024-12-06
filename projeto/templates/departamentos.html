@@ -1,28 +1,32 @@
 {% extends 'base.html' %}
 
 {% block conteudo %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/Departamentos.css') }}">
 
-<h1>Departamentos</h1>
-<a href="{{ url_for('editar_departamento') }}">Novo Departamento</a>
-<table>
-    <tr>
-        <th>Nome Departamento</th>
-        <th>Supervisor</th>
-        <th>Ações</th>
-    </tr>
+<!-- Substituindo o container por div -->
+<div class="Bloco1">
+    <h1>Departamentos</h1>
+    <a href="{{ url_for('editar_departamento') }}">Novo Departamento</a>
+    <table>
+        <tr>
+            <th>Nome Departamento</th>
+            <th>Supervisor</th>
+            <th>Ações</th>
+        </tr>
 
-    {% for dep in dados_departamentos %}
-    <tr>
-        <td>{{ dep.nome_departamento }}</td>
-        <td>{{ dep.nome or 'Não Definido' }}</td>
-        <td>
-            <a href="{{ url_for('editar_departamento', id_obtido=dep.id_departamento) }}">Editar</a>
-            <form action="{{ url_for('excluir_departamento', id_obtido=dep.id_departamento) }}" method="post" style="display:inline;">
-                <button type="submit" onclick="return confirm('Tem certeza que deseja excluir este departamento?');">Excluir</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+        {% for dep in dados_departamentos %}
+        <tr>
+            <td>{{ dep.nome_departamento }}</td>
+            <td>{{ dep.nome or 'Não Definido' }}</td>
+            <td>
+                <a href="{{ url_for('editar_departamento', id_obtido=dep.id_departamento) }}">Editar</a>
+                <form action="{{ url_for('excluir_departamento', id_obtido=dep.id_departamento) }}" method="post" style="display:inline;">
+                    <button class="buttondepart" type="submit" onclick="return confirm('Tem certeza que deseja excluir este departamento?');">Excluir</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
 
 {% endblock %}

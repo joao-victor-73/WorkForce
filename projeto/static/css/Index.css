@@ -1,0 +1,63 @@
+/* Estilo para a div principal */
+.div-all {
+    width: 100%;
+    max-width: 1200px;
+    margin-left: 120%;
+    margin-top: 20%;
+    padding: 50px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Título */
+h1 {
+    color: #f97316; /* Laranja */
+    text-align: center; /* Centraliza o texto */
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+/* Tabela */
+table {
+    width: 100%;  /* Ajusta a largura para 100% */
+    border-collapse: collapse;
+    background-color: white;  /* Fundo branco */
+    color: #191970;  /* Texto azul escuro */
+    border-radius: 5px;  /* Bordas arredondadas */
+    overflow: hidden;
+    margin-top: 20px; /* Distância superior da tabela */
+}
+
+/* Cabeçalho da tabela */
+thead {
+    background-color: #f97316;  /* Fundo laranja */
+    color: white;  /* Texto branco */
+}
+
+/* Células da tabela */
+th, td {
+    padding: 12px;  /* Menor padding para tornar as células mais compactas */
+    text-align: left;
+    border-bottom: 1px solid #f97316;  /* Linha de separação entre as células */
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f9f9f9;  /* Linhas alternadas com fundo claro */
+}
+
+/* Responsividade - Ajustes para telas menores */
+@media (max-width: 768px) {
+    .div-all {
+        width: 95%;  /* Aumenta a largura para 95% em telas pequenas */
+    }
+    table {
+        width: 100%;  /* Garante que a tabela ocupe toda a largura em telas pequenas */
+    }
+    th, td {
+        padding: 10px;  /* Reduz o padding nas células em telas pequenas */
+    }
+}

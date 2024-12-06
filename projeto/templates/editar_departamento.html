@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
 {% block conteudo %}
+<div class="all">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/Edit_Departamento.css') }}">
 
 <h1>{{ 'Editar Departamento' if departamento.id_departamento else 'Novo Departamento' }}</h1>
 
@@ -18,7 +20,7 @@
         {% endfor %}
     </select>
 
-    <button type="submit">Salvar</button>
+    <button class="buttonsave" type="submit">Salvar</button>
 </form>
-
+</div>
 {% endblock %}

@@ -113,6 +113,7 @@ class Funcionarios(db.Model):
     nome_cargo = db.Column(db.String(100))
     status_func = db.Column(db.Enum(
         'EFETIVO', 'FERIAS', 'DEMITIDO', 'ATESTADO'), nullable=False, default='EFETIVO')
+    status_informacao = db.Column(db.Boolean, default=True)
 
     fk_id_departamento = db.Column(
         db.Integer, db.ForeignKey('departamentos.id_departamento'))
@@ -311,7 +312,7 @@ def lista_de_funcionarios():
     consulta_base = db.session.query(
         Funcionarios,
         Departamentos.nome_departamento
-    ).outerjoin(Departamentos, Funcionarios.fk_id_departamento == Departamentos.id_departamento)
+    ).outerjoin(Departamentos, Funcionarios.fk_id_departamento == Departamentos.id_departamento).filter(Funcionarios.status_informacao == True)
 
     # Filtra os resultados se houver um termo de busca e também é como um filtro pelo nome
     if termo_busca:
@@ -658,14 +659,18 @@ def deletar_informacoes(id_func):
     funcionario = Funcionarios.query.get_or_404(id_func)
 
     try:
-        # Recupera e exclui o funcionário e suas informações associadas
+
+        if funcionario:
+            funcionario.status_informacao = False
+            db.session.commit()
+
+        """# Recupera e exclui o funcionário e suas informações associadas
         pessoa = Pessoas.query.get(funcionario.fk_id_pessoa)
         db.session.delete(funcionario)
-        db.session.commit()
 
         # Exclui também o registro pessoal associado
         db.session.delete(pessoa)
-        db.session.commit()
+        db.session.commit()"""
 
         flash("Funcionário e informações associadas excluídos com sucesso.", "success")
     except Exception as e:
